@@ -8,13 +8,14 @@
 <style>
   :root {
     --green-dark: #1b4332; --green-mid: #2d6a4f; --green-light: #40916c;
-    --green-accent: #52b788; --green-pale: #d8f3dc; --green-bg: #f0faf3;
-    --amber: #f4a261; --amber-light: #fff3e0;
-    --blue: #2196f3; --blue-light: #e3f2fd;
-    --red: #e63946; --red-light: #fdecea;
-    --gray-100: #f8f9fa; --gray-200: #e9ecef; --gray-400: #adb5bd;
-    --gray-600: #6c757d; --gray-800: #343a40; --white: #ffffff;
-    --shadow: 0 2px 12px rgba(0,0,0,0.08); --shadow-md: 0 4px 24px rgba(0,0,0,0.14);
+    --green-accent: #52b788; --green-pale: #e8f5ee; --green-bg: #f4f5f7;
+    --amber: #e8943a; --amber-light: #fef6ec;
+    --blue: #3b82f6; --blue-light: #eff6ff;
+    --red: #e63946; --red-light: #fef2f2;
+    --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb; --gray-300: #d1d5db;
+    --gray-400: #9ca3af; --gray-600: #6b7280; --gray-800: #1f2937; --white: #ffffff;
+    --shadow: 0 1px 4px rgba(0,0,0,0.06), 0 2px 10px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 20px rgba(0,0,0,0.10);
     --radius: 12px; --radius-sm: 8px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -59,11 +60,11 @@
   .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
   .topbar { background: white; padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gray-200); flex-shrink: 0; gap: 12px; }
   .topbar-left { display: flex; flex-direction: column; }
-  .topbar-title { font-size: 18px; font-weight: 700; color: var(--green-dark); }
-  .topbar-date { font-size: 13px; color: var(--gray-600); }
+  .topbar-title { font-size: 16px; font-weight: 700; color: var(--gray-800); }
+  .topbar-date { font-size: 12px; color: var(--gray-400); }
   .topbar-right { display: flex; align-items: center; gap: 10px; }
-  .topbar-badge { background: var(--green-pale); color: var(--green-mid); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-  .btn-new-client { background: var(--green-mid); color: white; border: none; padding: 9px 18px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.15s; }
+  .topbar-badge { background: var(--gray-100); color: var(--gray-600); padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; border: 1px solid var(--gray-200); }
+  .btn-new-client { background: var(--green-mid); color: white; border: none; padding: 9px 18px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.15s; }
   .btn-new-client:hover { background: var(--green-dark); }
   .content { flex: 1; overflow-y: auto; padding: 24px 28px; }
 
@@ -82,16 +83,16 @@
 
   /* KPI CARDS */
   .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-  .kpi-card { background: white; border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); border-left: 4px solid var(--green-accent); }
-  .kpi-card.amber { border-left-color: var(--amber); }
-  .kpi-card.blue { border-left-color: var(--blue); }
-  .kpi-card.red { border-left-color: var(--red); }
-  .kpi-label { font-size: 11px; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 6px; }
-  .kpi-value { font-size: 26px; font-weight: 800; color: var(--green-dark); line-height: 1; }
-  .kpi-card.amber .kpi-value { color: #b5541a; }
-  .kpi-card.blue .kpi-value { color: #1565c0; }
+  .kpi-card { background: white; border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); border-top: 3px solid var(--green-accent); }
+  .kpi-card.amber { border-top-color: var(--amber); }
+  .kpi-card.blue { border-top-color: var(--blue); }
+  .kpi-card.red { border-top-color: var(--red); }
+  .kpi-label { font-size: 11px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600; margin-bottom: 8px; }
+  .kpi-value { font-size: 24px; font-weight: 700; color: var(--gray-800); line-height: 1; }
+  .kpi-card.amber .kpi-value { color: var(--gray-800); }
+  .kpi-card.blue .kpi-value { color: var(--gray-800); }
   .kpi-card.red .kpi-value { color: var(--red); }
-  .kpi-sub { font-size: 12px; color: var(--gray-400); margin-top: 4px; }
+  .kpi-sub { font-size: 12px; color: var(--gray-400); margin-top: 5px; }
   .kpi-trend { font-size: 11px; margin-top: 8px; font-weight: 600; }
   .kpi-trend.up { color: var(--green-light); }
   .kpi-trend.down { color: var(--red); }
@@ -102,7 +103,7 @@
   /* CARD */
   .card { background: white; border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); }
   .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
-  .card-title { font-size: 15px; font-weight: 700; color: var(--green-dark); }
+  .card-title { font-size: 14px; font-weight: 700; color: var(--gray-800); letter-spacing: -0.1px; }
   .card-subtitle { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
   .chart-container { position: relative; height: 220px; }
   .chart-container-lg { position: relative; height: 280px; }
@@ -112,52 +113,54 @@
   .funnel-stage { flex: 1; text-align: center; padding: 18px 10px; position: relative; cursor: pointer; transition: transform 0.15s; }
   .funnel-stage:hover { transform: translateY(-2px); }
   .funnel-box { border-radius: var(--radius); padding: 20px 12px; margin: 0 4px; }
-  .funnel-box.prosp { background: var(--blue-light); border: 2px solid #90caf9; }
-  .funnel-box.pilot { background: var(--amber-light); border: 2px solid #ffcc80; }
-  .funnel-box.active { background: var(--green-pale); border: 2px solid var(--green-accent); }
-  .funnel-count { font-size: 36px; font-weight: 800; margin-bottom: 4px; }
+  .funnel-box.prosp { background: var(--blue-light); border: 1px solid #bfdbfe; }
+  .funnel-box.pilot { background: var(--amber-light); border: 1px solid #fed7aa; }
+  .funnel-box.active { background: var(--green-pale); border: 1px solid #a7f3c0; }
+  .funnel-count { font-size: 34px; font-weight: 700; margin-bottom: 4px; }
   .funnel-box.prosp .funnel-count { color: var(--blue); }
-  .funnel-box.pilot .funnel-count { color: #e65100; }
+  .funnel-box.pilot .funnel-count { color: var(--amber); }
   .funnel-box.active .funnel-count { color: var(--green-mid); }
-  .funnel-label { font-size: 13px; font-weight: 600; color: var(--gray-800); }
-  .funnel-arr { font-size: 11px; color: var(--gray-600); margin-top: 4px; }
+  .funnel-label { font-size: 12px; font-weight: 700; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.4px; }
+  .funnel-arr { font-size: 11px; color: var(--gray-400); margin-top: 4px; }
   .funnel-ha { font-size: 12px; color: var(--gray-600); margin-top: 3px; }
-  .funnel-arrow { font-size: 24px; color: var(--gray-400); flex-shrink: 0; align-self: center; }
+  .funnel-arrow { font-size: 20px; color: var(--gray-300); flex-shrink: 0; align-self: center; }
 
   /* PIPELINE KANBAN */
-  .pipeline-columns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
-  .pipeline-col { background: var(--gray-100); border-radius: var(--radius); padding: 16px; min-height: 400px; }
-  .pipeline-col-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 2px solid var(--gray-200); }
-  .pipeline-col-title { font-size: 14px; font-weight: 700; }
-  .pipeline-col-count { border-radius: 20px; padding: 2px 10px; font-size: 12px; font-weight: 600; color: white; }
-  .col-prosp .pipeline-col-count { background: var(--blue); }
-  .col-pilot .pipeline-col-count { background: var(--amber); }
-  .col-active .pipeline-col-count { background: var(--green-light); }
-  .client-card { background: white; border-radius: var(--radius-sm); padding: 14px; margin-bottom: 10px; box-shadow: var(--shadow); cursor: pointer; transition: box-shadow 0.15s, transform 0.15s; border-left: 4px solid var(--gray-200); }
+  .pipeline-columns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .pipeline-col { background: var(--gray-100); border-radius: var(--radius); padding: 14px; min-height: 400px; border: 2px solid transparent; transition: border-color 0.15s, background 0.15s; }
+  .pipeline-col.drag-over { border-color: var(--green-accent); background: #f0faf5; }
+  .pipeline-col-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--gray-200); }
+  .pipeline-col-title { font-size: 13px; font-weight: 700; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px; }
+  .pipeline-col-count { border-radius: 6px; padding: 2px 8px; font-size: 12px; font-weight: 700; }
+  .col-prosp .pipeline-col-count { background: var(--blue-light); color: var(--blue); }
+  .col-pilot .pipeline-col-count { background: var(--amber-light); color: var(--amber); }
+  .col-active .pipeline-col-count { background: var(--green-pale); color: var(--green-mid); }
+  .client-card { background: white; border-radius: var(--radius-sm); padding: 14px; margin-bottom: 8px; box-shadow: var(--shadow); cursor: grab; transition: box-shadow 0.15s, transform 0.15s, opacity 0.15s; border-left: 3px solid var(--gray-200); user-select: none; }
   .client-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+  .client-card.dragging { opacity: 0.4; cursor: grabbing; }
   .client-card.prosp { border-left-color: var(--blue); }
   .client-card.pilot { border-left-color: var(--amber); }
   .client-card.active { border-left-color: var(--green-accent); }
-  .client-card-name { font-size: 14px; font-weight: 700; color: var(--gray-800); margin-bottom: 6px; }
-  .client-card-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
-  .badge { font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 600; }
-  .badge-country { background: var(--green-pale); color: var(--green-mid); }
+  .client-card-name { font-size: 13px; font-weight: 700; color: var(--gray-800); margin-bottom: 6px; }
+  .client-card-meta { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 5px; font-weight: 600; }
+  .badge-country { background: var(--gray-100); color: var(--gray-600); border: 1px solid var(--gray-200); }
   .badge-b2c { background: var(--blue-light); color: var(--blue); }
-  .badge-b2b { background: #f3e5f5; color: #7b1fa2; }
-  .client-card-arr { font-size: 13px; color: var(--gray-600); margin-bottom: 6px; }
-  .client-card-arr strong { color: var(--green-dark); font-size: 15px; }
-  .progress-bar-wrap { height: 5px; background: var(--gray-200); border-radius: 10px; overflow: hidden; }
+  .badge-b2b { background: #f5f3ff; color: #6d28d9; }
+  .client-card-arr { font-size: 12px; color: var(--gray-400); margin-bottom: 6px; }
+  .client-card-arr strong { color: var(--gray-800); font-size: 13px; font-weight: 700; }
+  .progress-bar-wrap { height: 4px; background: var(--gray-200); border-radius: 10px; overflow: hidden; }
   .progress-bar { height: 100%; border-radius: 10px; }
   .progress-bar.prosp { background: var(--blue); }
   .progress-bar.pilot { background: var(--amber); }
   .progress-bar.active { background: var(--green-accent); }
 
   /* FILTER BAR */
-  .filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
-  .filter-btn { padding: 7px 16px; border-radius: 20px; border: 2px solid var(--gray-200); background: white; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; color: var(--gray-600); }
+  .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+  .filter-btn { padding: 6px 14px; border-radius: 6px; border: 1px solid var(--gray-200); background: white; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; color: var(--gray-600); }
   .filter-btn.active { border-color: var(--green-accent); background: var(--green-pale); color: var(--green-mid); }
-  .filter-btn:hover:not(.active) { border-color: var(--gray-400); }
-  .search-input { padding: 8px 14px; border-radius: 20px; border: 2px solid var(--gray-200); font-size: 13px; outline: none; flex: 1; max-width: 260px; }
+  .filter-btn:hover:not(.active) { border-color: var(--gray-400); background: var(--gray-50); }
+  .search-input { padding: 7px 14px; border-radius: 6px; border: 1px solid var(--gray-200); font-size: 13px; outline: none; flex: 1; max-width: 260px; }
   .search-input:focus { border-color: var(--green-accent); }
 
   /* TABLE */
@@ -261,10 +264,27 @@
   .alert-text { font-size: 13px; color: var(--gray-600); line-height: 1.5; }
 
   /* SCROLLBAR */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 10px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--gray-400); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--gray-300); }
+
+  /* STATUS BADGES */
+  .status-badge.activo { background: #f0fdf4; color: #16a34a; }
+  .status-badge.piloto { background: #fffbeb; color: #d97706; }
+  .status-badge.prospecto { background: var(--blue-light); color: var(--blue); }
+
+  /* USUARIOS VIEW */
+  .user-list { display: flex; flex-direction: column; gap: 10px; }
+  .user-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: white; border-radius: var(--radius-sm); box-shadow: var(--shadow); border: 1px solid var(--gray-200); }
+  .user-info { display: flex; flex-direction: column; gap: 2px; }
+  .user-name { font-size: 14px; font-weight: 700; color: var(--gray-800); }
+  .user-role { font-size: 11px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.4px; }
+  .user-add-form { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-top: 20px; padding: 20px; background: var(--gray-50); border-radius: var(--radius-sm); border: 1px dashed var(--gray-200); }
+  .user-add-form input { padding: 10px 14px; border: 1px solid var(--gray-200); border-radius: var(--radius-sm); font-size: 13px; outline: none; font-family: inherit; background: white; }
+  .user-add-form input:focus { border-color: var(--green-accent); }
+  .btn-del-user { background: none; border: 1px solid var(--gray-200); color: var(--gray-400); padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.15s; }
+  .btn-del-user:hover { background: var(--red-light); color: var(--red); border-color: var(--red); }
 
   /* TOOLTIPS */
   .kpi-label { display: flex; align-items: center; gap: 5px; }
@@ -329,6 +349,9 @@
     <div class="nav-divider"></div>
     <div class="nav-section-label">Análisis</div>
     <div class="nav-item" onclick="showView('global',this)"><span class="icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span> Análisis Global</div>
+    <div class="nav-divider"></div>
+    <div class="nav-section-label">Admin</div>
+    <div class="nav-item" onclick="showView('usuarios',this)"><span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><line x1="19" y1="8" x2="23" y2="8"/><line x1="21" y1="6" x2="21" y2="10"/></svg></span> Usuarios</div>
   </nav>
   <div class="sidebar-footer">
     v2.0 · BaumApp Pipeline
@@ -884,6 +907,27 @@
 
     </div><!-- /view-superficie -->
 
+    <!-- USUARIOS -->
+    <div id="view-usuarios" class="view">
+      <div style="max-width:600px;margin:0 auto">
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Gestión de Usuarios</div>
+              <div class="card-subtitle">Usuarios con acceso a la plataforma</div>
+            </div>
+          </div>
+          <div class="user-list" id="user-list"></div>
+          <div class="user-add-form">
+            <input type="text" id="new-username" placeholder="Nombre de usuario" autocomplete="off">
+            <input type="password" id="new-password" placeholder="Contraseña" autocomplete="new-password">
+            <button class="btn btn-primary btn-sm" onclick="addUser()">Agregar</button>
+          </div>
+          <div style="font-size:12px;color:var(--gray-400);margin-top:12px">Los cambios se guardan localmente en este dispositivo. Para cambios globales, edita el archivo.</div>
+        </div>
+      </div>
+    </div><!-- /view-usuarios -->
+
   </div><!-- /content -->
 </main>
 
@@ -1112,7 +1156,8 @@ const TITLES = {
   reuniones:'Reuniones & Seguimiento',
   tarifario:'Tarifario',
   baumsystem:'BaumSystem',
-  global:'Análisis Global'
+  global:'Análisis Global',
+  usuarios:'Gestión de Usuarios'
 };
 function showView(id, el) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -1128,6 +1173,7 @@ function showView(id, el) {
   if (id==='tarifario')   renderTarifario();
   if (id==='baumsystem')  renderBaumSystem();
   if (id==='global')      renderGlobal();
+  if (id==='usuarios')    renderUsersView();
 }
 function goToPipeline() { showView('pipeline', document.querySelectorAll('.nav-item')[1]); }
 
@@ -1565,34 +1611,82 @@ function renderPipeline() {
   document.getElementById('pl-a-active').textContent = 'ARR: '+fmt(ac.reduce((s,c)=>s+c.arr,0));
 
   const card = c => `
-    <div class="client-card ${fc(c.status)}" onclick="openEditModal(${c.id})">
+    <div class="client-card ${fc(c.status)}" draggable="true" data-id="${c.id}" onclick="pipelineCardClick(event,${c.id})">
       <div class="client-card-name">${c.name}</div>
       <div class="client-card-meta">
         <span class="badge badge-country">${c.country}</span>
         <span class="badge ${c.type==='B2B'?'badge-b2b':'badge-b2c'}">${c.type}</span>
-        <span class="badge" style="background:#f5f5f5;color:#666">${fmtHa(c.hectares)}</span>
+        <span class="badge" style="background:var(--gray-100);color:var(--gray-600);border:1px solid var(--gray-200)">${fmtHa(c.hectares)}</span>
       </div>
       <div class="client-card-arr">ARR: <strong>${fmt(c.arr)}</strong> · ${fmt(c.mrr)}/mes</div>
       <div class="progress-bar-wrap"><div class="progress-bar ${fc(c.status)}" style="width:${c.progress}%"></div></div>
       <div style="font-size:11px;color:var(--gray-400);margin-top:4px">${c.progress}% avance</div>
     </div>`;
 
-  const col = (list, cls, icon, label) => `
-    <div class="pipeline-col ${cls}">
+  const col = (list, cls, icon, label, status) => `
+    <div class="pipeline-col ${cls}" data-status="${status}">
       <div class="pipeline-col-header">
         <div>
-          <div class="pipeline-col-title">${icon} ${label}</div>
-          <div style="font-size:11px;color:var(--gray-400)">${fmtHa(list.reduce((s,c)=>s+c.hectares,0))} · ${fmt(list.reduce((s,c)=>s+c.arr,0))} ARR</div>
+          <div class="pipeline-col-title">${label}</div>
+          <div style="font-size:11px;color:var(--gray-400);margin-top:2px">${fmtHa(list.reduce((s,c)=>s+c.hectares,0))} · ${fmt(list.reduce((s,c)=>s+c.arr,0))} ARR</div>
         </div>
         <span class="pipeline-col-count">${list.length}</span>
       </div>
-      ${list.length ? list.map(card).join('') : '<div class="empty-state" style="padding:20px"><div style="font-size:20px;color:var(--gray-300)">—</div>Sin clientes</div>'}
+      ${list.length ? list.map(card).join('') : '<div class="empty-state" style="padding:24px 12px;font-size:13px">Arrastra tarjetas aquí</div>'}
     </div>`;
 
   document.getElementById('pipeline-columns').innerHTML =
-    col(pr,'col-prosp','·','Prospectos') +
-    col(pi,'col-pilot','·','Pilotos')    +
-    col(ac,'col-active','·','Activos');
+    col(pr,'col-prosp','·','Prospectos','Prospecto') +
+    col(pi,'col-pilot','·','Pilotos','Piloto')       +
+    col(ac,'col-active','·','Activos','Activo');
+
+  setupDragDrop();
+}
+
+let _pipelineDragMoved = false;
+function pipelineCardClick(e, id) {
+  if (_pipelineDragMoved) { _pipelineDragMoved = false; return; }
+  openEditModal(id);
+}
+
+function setupDragDrop() {
+  let dragId = null;
+  const cards = document.querySelectorAll('.client-card[data-id]');
+  const cols  = document.querySelectorAll('.pipeline-col[data-status]');
+
+  cards.forEach(card => {
+    card.addEventListener('dragstart', e => {
+      dragId = parseInt(card.dataset.id);
+      _pipelineDragMoved = true;
+      setTimeout(() => card.classList.add('dragging'), 0);
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    card.addEventListener('dragend', () => {
+      card.classList.remove('dragging');
+    });
+  });
+
+  cols.forEach(col => {
+    col.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
+    col.addEventListener('dragenter', () => col.classList.add('drag-over'));
+    col.addEventListener('dragleave', e => {
+      if (!col.contains(e.relatedTarget)) col.classList.remove('drag-over');
+    });
+    col.addEventListener('drop', e => {
+      e.preventDefault();
+      col.classList.remove('drag-over');
+      const newStatus = col.dataset.status;
+      const client = clients.find(c => c.id === dragId);
+      if (client && client.status !== newStatus) {
+        client.status = newStatus;
+        persist();
+        renderPipeline();
+        renderDashboard();
+        toast('Movido a ' + newStatus);
+      }
+      dragId = null;
+    });
+  });
 }
 
 // ─── TABLE ───────────────────────────────────────────────────
@@ -2102,19 +2196,30 @@ function renderWeeklyLog() {
 }
 function deleteWeeklyLog(i) { weeklyLog.splice(i,1); persist(); renderWeeklyLog(); }
 
-// ─── AUTH ─────────────────────────────────────────────────────
-// Para agregar más usuarios, añade entradas al objeto USERS.
-// Formato: 'usuario': 'contraseña'
-const USERS = {
-  'baumapp': 'Baum2025!',
-  'berni':   'Baum2025!'
-};
+// ─── AUTH & GESTIÓN DE USUARIOS ──────────────────────────────
+const DEFAULT_USERS = { 'baumapp': 'Baum2025!', 'berni': 'Baum2025!' };
+
+function loadAppUsers() {
+  try {
+    const stored = localStorage.getItem('baum_users_v1');
+    if (stored) return JSON.parse(stored);
+  } catch(e) {}
+  localStorage.setItem('baum_users_v1', JSON.stringify(DEFAULT_USERS));
+  return { ...DEFAULT_USERS };
+}
+
+function saveAppUsers(u) {
+  localStorage.setItem('baum_users_v1', JSON.stringify(u));
+}
+
+let appUsers = loadAppUsers();
 
 function doLogin() {
   const user = document.getElementById('login-user').value.trim().toLowerCase();
   const pass = document.getElementById('login-pass').value;
   const err  = document.getElementById('login-error');
-  if (USERS[user] && USERS[user] === pass) {
+  appUsers = loadAppUsers();
+  if (appUsers[user] && appUsers[user] === pass) {
     sessionStorage.setItem('baum_auth', '1');
     sessionStorage.setItem('baum_user', user);
     document.getElementById('login-screen').style.display = 'none';
@@ -2133,6 +2238,55 @@ function doLogout() {
   document.getElementById('login-pass').value = '';
   document.getElementById('login-error').textContent = '';
   document.getElementById('login-screen').style.display = 'flex';
+}
+
+function renderUsersView() {
+  appUsers = loadAppUsers();
+  const currentUser = sessionStorage.getItem('baum_user') || '';
+  const list = document.getElementById('user-list');
+  if (!list) return;
+  const entries = Object.keys(appUsers);
+  if (!entries.length) {
+    list.innerHTML = '<div class="empty-state">Sin usuarios registrados.</div>';
+    return;
+  }
+  list.innerHTML = entries.map(u => `
+    <div class="user-row">
+      <div class="user-info">
+        <div class="user-name">${u}</div>
+        <div class="user-role">${u === currentUser ? 'Sesión actual' : 'Usuario'}</div>
+      </div>
+      ${u !== currentUser
+        ? `<button class="btn-del-user" onclick="deleteUser('${u}')">Eliminar</button>`
+        : `<span style="font-size:11px;color:var(--green-mid);font-weight:600">Activo</span>`
+      }
+    </div>`).join('');
+}
+
+function addUser() {
+  const uInput = document.getElementById('new-username');
+  const pInput = document.getElementById('new-password');
+  const u = uInput.value.trim().toLowerCase();
+  const p = pInput.value;
+  if (!u || !p) { toast('Completa usuario y contraseña'); return; }
+  if (u.length < 3) { toast('El usuario debe tener al menos 3 caracteres'); return; }
+  if (p.length < 6) { toast('La contraseña debe tener al menos 6 caracteres'); return; }
+  appUsers = loadAppUsers();
+  if (appUsers[u]) { toast('Ese usuario ya existe'); return; }
+  appUsers[u] = p;
+  saveAppUsers(appUsers);
+  uInput.value = ''; pInput.value = '';
+  renderUsersView();
+  toast('Usuario "' + u + '" creado');
+}
+
+function deleteUser(u) {
+  appUsers = loadAppUsers();
+  if (Object.keys(appUsers).length <= 1) { toast('Debe quedar al menos un usuario'); return; }
+  delete appUsers[u];
+  saveAppUsers(appUsers);
+  renderUsersView();
+  toast('Usuario eliminado');
 }
 
 // Verificar sesión al cargar

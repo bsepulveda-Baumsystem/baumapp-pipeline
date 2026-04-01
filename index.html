@@ -14,7 +14,7 @@
     --green-light: #6aab80;
     --green-accent: #8ecfa4;     /* acento pastel verde */
     --green-pale: #e6f4ec;       /* fondos verdes muy suaves */
-    --green-bg: #f2f5f3;         /* fondo general */
+    --green-bg: #f5f6f8;         /* fondo general — gris neutro ClickUp */
 
     --sky: #7ab8d8;              /* celeste pastel */
     --sky-light: #e8f4fa;        /* fondo celeste suave */
@@ -88,7 +88,7 @@
 
   /* MAIN */
   .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-  .topbar { background: white; padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gray-200); flex-shrink: 0; gap: 12px; }
+  .topbar { background: white; padding: 12px 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gray-200); flex-shrink: 0; gap: 12px; }
   .topbar-left { display: flex; flex-direction: column; }
   .topbar-title { font-size: 16px; font-weight: 700; color: var(--gray-800); }
   .topbar-date { font-size: 12px; color: var(--gray-400); }
@@ -105,23 +105,23 @@
   .fx-input:focus { border-color: var(--green-accent); }
   .fx-flag { font-size: 15px; }
   /* CLP secondary value under each KPI */
-  .kpi-clp { font-size: 12px; color: #7c6f99; margin-top: 2px; font-weight: 600; letter-spacing: -0.2px; }
+  .kpi-clp { font-size: 11px; color: var(--gray-400); margin-top: 2px; font-weight: 500; letter-spacing: -0.1px; }
 
   /* VIEWS */
   .view { display: none; }
   .view.active { display: block; }
 
-  /* KPI CARDS */
-  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
-  .kpi-card { background: white; border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); border-top: 3px solid var(--green-accent); }
-  .kpi-card.amber { border-top-color: var(--peach); }
-  .kpi-card.blue { border-top-color: var(--sky); }
-  .kpi-card.red { border-top-color: var(--red); }
-  .kpi-label { font-size: 11px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700; margin-bottom: 8px; }
-  .kpi-value { font-size: 23px; font-weight: 800; color: var(--gray-800); line-height: 1; }
+  /* KPI CARDS — estilo ClickUp: blanco limpio, sin color decorativo */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .kpi-card { background: white; border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); border: 1px solid var(--gray-200); }
+  .kpi-card.amber { border: 1px solid var(--gray-200); }
+  .kpi-card.blue  { border: 1px solid var(--gray-200); }
+  .kpi-card.red   { border: 1px solid var(--gray-200); }
+  .kpi-label { font-size: 11px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.7px; font-weight: 700; margin-bottom: 8px; }
+  .kpi-value { font-size: 22px; font-weight: 800; color: var(--gray-800); line-height: 1; }
   .kpi-card.amber .kpi-value { color: var(--gray-800); }
-  .kpi-card.blue .kpi-value { color: var(--gray-800); }
-  .kpi-card.red .kpi-value { color: var(--red); }
+  .kpi-card.blue  .kpi-value { color: var(--gray-800); }
+  .kpi-card.red   .kpi-value { color: var(--red); }
   .kpi-sub { font-size: 11px; color: var(--gray-400); margin-top: 5px; font-weight: 500; }
   .kpi-trend { font-size: 11px; margin-top: 8px; font-weight: 700; }
   .kpi-trend.up { color: var(--green-light); }
@@ -130,11 +130,11 @@
   /* GRID LAYOUTS */
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
 
-  /* CARD */
-  .card { background: white; border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); }
-  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
-  .card-title { font-size: 14px; font-weight: 700; color: var(--gray-800); letter-spacing: -0.1px; }
-  .card-subtitle { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+  /* CARD — estilo ClickUp */
+  .card { background: white; border-radius: var(--radius); padding: 20px 22px; box-shadow: none; border: 1px solid var(--gray-200); }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .card-title { font-size: 13px; font-weight: 700; color: var(--gray-800); letter-spacing: 0px; }
+  .card-subtitle { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
   .chart-container { position: relative; height: 220px; }
   .chart-container-lg { position: relative; height: 280px; }
 
@@ -157,7 +157,7 @@
 
   /* PIPELINE KANBAN */
   .pipeline-columns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-  .pipeline-col { background: var(--gray-100); border-radius: var(--radius); padding: 14px; min-height: 400px; border: 2px solid transparent; transition: border-color 0.15s, background 0.15s; }
+  .pipeline-col { background: var(--gray-50); border-radius: var(--radius); padding: 14px; min-height: 400px; border: 1px solid var(--gray-200); transition: border-color 0.15s, background 0.15s; }
   .pipeline-col.drag-over { border-color: var(--green-accent); background: #f0faf5; }
   .pipeline-col-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--gray-200); }
   .pipeline-col-title { font-size: 13px; font-weight: 700; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px; }
@@ -165,8 +165,8 @@
   .col-prosp .pipeline-col-count { background: var(--sky-light); color: var(--sky-mid); }
   .col-pilot .pipeline-col-count { background: var(--peach-light); color: var(--peach); }
   .col-active .pipeline-col-count { background: var(--green-pale); color: var(--green-mid); }
-  .client-card { background: white; border-radius: var(--radius-sm); padding: 14px; margin-bottom: 8px; box-shadow: var(--shadow); cursor: grab; transition: box-shadow 0.15s, transform 0.15s, opacity 0.15s; border-left: 3px solid var(--gray-200); user-select: none; }
-  .client-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+  .client-card { background: white; border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 8px; box-shadow: none; cursor: grab; transition: box-shadow 0.15s, transform 0.15s, opacity 0.15s; border: 1px solid var(--gray-200); border-left: 3px solid var(--gray-300); user-select: none; }
+  .client-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); transform: translateY(-1px); border-color: var(--gray-300); }
   .client-card.dragging { opacity: 0.4; cursor: grabbing; }
   .client-card.prosp { border-left-color: var(--sky); }
   .client-card.pilot { border-left-color: var(--peach); }
@@ -331,6 +331,105 @@
   .toast.show { opacity: 1; transform: translateY(0); }
   .empty-state { text-align: center; padding: 40px 20px; color: var(--gray-400); font-size: 14px; }
   .empty-state div { font-size: 36px; margin-bottom: 10px; }
+
+  /* ─── SORT TABLE ─── */
+  thead th.sortable { cursor: pointer; user-select: none; position: relative; padding-right: 22px; }
+  thead th.sortable::after { content: '⇅'; position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 10px; opacity: 0.4; }
+  thead th.sortable.asc::after { content: '↑'; opacity: 0.8; }
+  thead th.sortable.desc::after { content: '↓'; opacity: 0.8; }
+
+  /* ─── NOTIFICATION CENTER ─── */
+  .notif-bell { position: relative; background: none; border: 1px solid var(--gray-200); border-radius: 8px; padding: 7px 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+  .notif-bell:hover { background: var(--gray-100); border-color: var(--gray-300); }
+  .notif-bell svg { width: 18px; height: 18px; stroke: var(--gray-600); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .notif-badge { position: absolute; top: -5px; right: -5px; background: var(--red); color: white; font-size: 10px; font-weight: 800; min-width: 18px; height: 18px; border-radius: 9px; display: flex; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid white; }
+  .notif-badge:empty, .notif-badge[data-count="0"] { display: none; }
+  .notif-panel { position: absolute; top: calc(100% + 8px); right: 0; width: 380px; max-height: 440px; background: white; border-radius: var(--radius); box-shadow: 0 12px 40px rgba(0,0,0,0.15); border: 1px solid var(--gray-200); z-index: 2000; display: none; flex-direction: column; overflow: hidden; }
+  .notif-panel.open { display: flex; }
+  .notif-panel-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--gray-200); flex-shrink: 0; }
+  .notif-panel-title { font-size: 14px; font-weight: 700; color: var(--gray-800); }
+  .notif-clear-btn { font-size: 11px; color: var(--gray-400); background: none; border: none; cursor: pointer; font-weight: 600; font-family: inherit; padding: 4px 8px; border-radius: 4px; transition: all 0.15s; }
+  .notif-clear-btn:hover { background: var(--gray-100); color: var(--gray-600); }
+  .notif-list { flex: 1; overflow-y: auto; }
+  .notif-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--gray-100); transition: background 0.1s; cursor: default; animation: notifSlide 0.25s ease; }
+  .notif-item:hover { background: var(--gray-50); }
+  .notif-item .notif-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+  .notif-item .notif-icon.warn { background: #FFF3CD; }
+  .notif-item .notif-icon.danger { background: #F8D7DA; }
+  .notif-item .notif-icon.info { background: var(--sky-light); }
+  .notif-item .notif-body { flex: 1; min-width: 0; }
+  .notif-item .notif-text { font-size: 13px; color: var(--gray-800); line-height: 1.45; }
+  .notif-item .notif-text strong { font-weight: 700; }
+  .notif-item .notif-time { font-size: 11px; color: var(--gray-400); margin-top: 3px; }
+  .notif-item .notif-dismiss { background: none; border: none; color: var(--gray-300); cursor: pointer; font-size: 16px; padding: 0 2px; flex-shrink: 0; transition: color 0.15s; align-self: center; }
+  .notif-item .notif-dismiss:hover { color: var(--red); }
+  .notif-empty { padding: 40px 20px; text-align: center; color: var(--gray-400); font-size: 13px; }
+  .notif-empty-icon { font-size: 28px; margin-bottom: 8px; opacity: 0.5; }
+  @keyframes notifSlide { from { opacity:0; transform:translateX(10px) } to { opacity:1; transform:translateX(0) } }
+  @media (max-width: 640px) {
+    .notif-panel { width: calc(100vw - 20px); right: -60px; }
+  }
+
+  /* ─── SNAPSHOT COMPARISON ─── */
+  .snapshot-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding: 12px 18px; background: white; border-radius: var(--radius); border: 1px solid var(--gray-200); flex-wrap: wrap; }
+  .snapshot-bar .snap-label { font-size: 12px; font-weight: 700; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.4px; }
+  .snap-delta { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 6px; }
+  .snap-delta.up { background: #ECFDF5; color: #065F46; }
+  .snap-delta.down { background: #FEF2F2; color: #991B1B; }
+  .snap-delta.neutral { background: var(--gray-100); color: var(--gray-600); }
+  .snap-btn { padding: 6px 14px; border-radius: 6px; border: 1px solid var(--green-accent); background: var(--green-pale); color: var(--green-mid); font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .snap-btn:hover { background: var(--green-accent); color: white; }
+
+  /* ─── EXPORT BTN ─── */
+  .btn-export { display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; border-radius: 6px; border: 1px solid var(--gray-200); background: white; color: var(--gray-600); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .btn-export:hover { border-color: var(--green-accent); color: var(--green-mid); background: var(--green-pale); }
+  .btn-export svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+  /* ─── MODAL VALIDATION ─── */
+  .form-input.error { border-color: var(--red); background: var(--red-light); }
+  .form-error-text { font-size: 11px; color: var(--red); font-weight: 600; margin-top: 2px; display: none; }
+  .form-group.has-error .form-error-text { display: block; }
+  .form-group.has-error .form-input { border-color: var(--red); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 1024px) {
+    .sidebar { width: 56px; overflow: hidden; }
+    .sidebar-logo h1, .sidebar-logo p, .nav-item span:not(.icon), .sidebar-footer, .nav-section-label { display: none; }
+    .nav-item { padding: 12px 0; justify-content: center; border-left: none; }
+    .nav-item.active { border-left: none; background: rgba(168,223,192,0.15); }
+    .nav-item .icon { width: 22px; height: 22px; }
+    .nav-item .icon svg { width: 18px; height: 18px; }
+    .kpi-grid { grid-template-columns: repeat(3, 1fr) !important; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .pipeline-columns { grid-template-columns: 1fr; }
+    .topbar { padding: 10px 16px; }
+    .content { padding: 16px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .modal { max-width: 95vw; }
+  }
+  @media (max-width: 640px) {
+    .sidebar { display: none; }
+    body { flex-direction: column; }
+    .main { height: 100vh; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px; }
+    .kpi-value { font-size: 18px; }
+    .kpi-card { padding: 14px 16px; }
+    .topbar-right { flex-wrap: wrap; }
+    .fx-wrap { display: none; }
+    .btn-new-client { font-size: 12px; padding: 7px 12px; }
+    .funnel-wrap { flex-direction: column; gap: 8px; }
+    .funnel-arrow { transform: rotate(90deg); }
+    .snapshot-bar { flex-direction: column; align-items: flex-start; }
+    table { font-size: 12px; }
+    thead th, tbody td { padding: 8px 6px; }
+    /* Mobile nav */
+    .mobile-nav { display: flex !important; }
+  }
+  /* Mobile bottom nav */
+  .mobile-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--green-dark); z-index: 999; padding: 6px 0 env(safe-area-inset-bottom, 6px); justify-content: space-around; }
+  .mobile-nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; color: rgba(255,255,255,0.5); font-size: 10px; font-weight: 600; padding: 6px 8px; cursor: pointer; transition: color 0.15s; border: none; background: none; }
+  .mobile-nav-item.active { color: #a8dfc0; }
+  .mobile-nav-item svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.75; }
 </style>
 </head>
 <body>
@@ -402,7 +501,21 @@
         <label>USD/CLP</label>
         <input class="fx-input" type="number" id="fx-rate" min="1" step="1" placeholder="950" oninput="updateFX()">
       </div>
+      <div style="position:relative">
+        <button class="notif-bell" id="notif-bell" onclick="toggleNotifPanel(event)">
+          <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-badge" id="notif-badge"></span>
+        </button>
+        <div class="notif-panel" id="notif-panel">
+          <div class="notif-panel-header">
+            <div class="notif-panel-title">Notificaciones</div>
+            <button class="notif-clear-btn" onclick="clearAllNotifs()">Marcar todo leído</button>
+          </div>
+          <div class="notif-list" id="notif-list"></div>
+        </div>
+      </div>
       <div class="topbar-badge">BaumApp</div>
+      <button class="btn-export" onclick="exportClientsCSV()" title="Exportar CSV"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> CSV</button>
       <button class="btn-new-client" onclick="openNewClientModal()">+ Nuevo cliente</button>
     </div>
   </div>
@@ -410,6 +523,14 @@
 
     <!-- DASHBOARD HA (BaumApp) -->
     <div id="view-dashboard" class="view active">
+
+      <!-- Snapshot comparison -->
+      <div class="snapshot-bar" id="snapshot-bar">
+        <span class="snap-label">📸 Comparar semana a semana</span>
+        <button class="snap-btn" onclick="takeSnapshot()">Guardar snapshot actual</button>
+        <span id="snap-info" style="font-size:12px;color:var(--gray-400)"></span>
+        <div id="snap-deltas" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+      </div>
 
       <!-- Ha KPI cards -->
       <div class="kpi-grid" style="grid-template-columns:repeat(5,1fr)">
@@ -428,12 +549,12 @@
           <div class="kpi-value" id="sh-prosp">—</div>
           <div class="kpi-sub" id="sh-prosp-c">— clientes</div>
         </div>
-        <div class="kpi-card" style="border-left-color:#8e44ad">
+        <div class="kpi-card" >
           <div class="kpi-label">Ha Potencial Total <span class="tip" data-tip="Suma de todas las hectáreas del pipeline completo: activas + pilotos + prospectos. Es el máximo posible de superficie administrada.">?</span></div>
-          <div class="kpi-value" id="sh-total" style="color:#8e44ad">—</div>
+          <div class="kpi-value" id="sh-total" >—</div>
           <div class="kpi-sub">ha en todo el pipeline</div>
         </div>
-        <div class="kpi-card" style="border-left-color:#00897b">
+        <div class="kpi-card" >
           <div class="kpi-label">% Ha Cerradas <span class="tip" data-tip="Porcentaje de hectáreas activas sobre el total potencial del pipeline. Indica qué tan avanzado está el pipeline en términos de superficie.">?</span></div>
           <div class="kpi-value" id="sh-pct" style="color:#00897b">—</div>
           <div class="kpi-sub">activo vs potencial total</div>
@@ -555,12 +676,22 @@
         <button class="filter-btn" onclick="filterClients('B2C',this)">B2C</button>
         <input class="search-input" type="text" placeholder="Buscar cliente..." oninput="searchClients(this.value)" id="search-input">
       </div>
-      <div class="card" style="padding:0;overflow:hidden">
-        <table>
+      <div class="card" style="padding:0;overflow-x:auto">
+        <table id="clients-table">
           <thead>
             <tr>
-              <th>Cliente</th><th>País / Región</th><th>Ha</th><th>$/Ha/Año</th>
-              <th>ARR (USD)</th><th>ARR (CLP)</th><th>MRR (USD)</th><th>MRR (CLP)</th><th>Tipo</th><th>Estado</th><th>Inicio</th><th></th>
+              <th class="sortable" data-sort="name" onclick="sortTable('name',this)">Cliente</th>
+              <th class="sortable" data-sort="country" onclick="sortTable('country',this)">País / Región</th>
+              <th class="sortable" data-sort="hectares" onclick="sortTable('hectares',this)">Ha</th>
+              <th class="sortable" data-sort="pricePerHaYear" onclick="sortTable('pricePerHaYear',this)">$/Ha/Año</th>
+              <th class="sortable" data-sort="arr" onclick="sortTable('arr',this)">ARR (USD)</th>
+              <th>ARR (CLP)</th>
+              <th class="sortable" data-sort="mrr" onclick="sortTable('mrr',this)">MRR (USD)</th>
+              <th>MRR (CLP)</th>
+              <th>Tipo</th>
+              <th class="sortable" data-sort="status" onclick="sortTable('status',this)">Estado</th>
+              <th class="sortable" data-sort="startDate" onclick="sortTable('startDate',this)">Inicio</th>
+              <th></th>
             </tr>
           </thead>
           <tbody id="clients-tbody"></tbody>
@@ -712,9 +843,9 @@
           <div class="kpi-label">CHURN Ref. Anual <span class="tip" data-tip="Tasa estimada de cancelación anual, basada en historial BaumSystem.">?</span></div>
           <div class="kpi-value">~5%</div><div class="kpi-sub">Ref. BaumSystem 31 meses</div>
         </div>
-        <div class="kpi-card" style="border-left-color:#8e44ad">
+        <div class="kpi-card" >
           <div class="kpi-label">$/Ha/Año Promedio <span class="tip" data-tip="Precio promedio USD por ha/año sobre clientes activos.">?</span></div>
-          <div class="kpi-value" id="kpi-ha-price" style="color:#8e44ad">—</div><div class="kpi-clp" id="kpi-ha-clp"></div>
+          <div class="kpi-value" id="kpi-ha-price" >—</div><div class="kpi-clp" id="kpi-ha-clp"></div>
           <div class="kpi-sub" id="kpi-ha-sub">USD/ha/año</div>
         </div>
       </div>
@@ -855,12 +986,12 @@
           <div class="kpi-value" id="sh-prosp">—</div>
           <div class="kpi-sub" id="sh-prosp-c">— clientes</div>
         </div>
-        <div class="kpi-card" style="border-left-color:#8e44ad">
+        <div class="kpi-card" >
           <div class="kpi-label">Ha Potencial Total <span class="tip" data-tip="Suma de todas las hectáreas del pipeline completo: activas + pilotos + prospectos. Es el máximo posible de superficie administrada.">?</span></div>
-          <div class="kpi-value" id="sh-total" style="color:#8e44ad">—</div>
+          <div class="kpi-value" id="sh-total" >—</div>
           <div class="kpi-sub">ha en todo el pipeline</div>
         </div>
-        <div class="kpi-card" style="border-left-color:#00897b">
+        <div class="kpi-card" >
           <div class="kpi-label">Crecimiento Ha <span class="tip" data-tip="Porcentaje de hectáreas activas sobre el total potencial del pipeline. Indica qué tan avanzado está el pipeline en términos de superficie.">?</span></div>
           <div class="kpi-value" id="sh-pct" style="color:#00897b">—</div>
           <div class="kpi-sub">% activo vs potencial</div>
@@ -996,9 +1127,10 @@
       <!-- TAB: INFORMACIÓN -->
       <div class="modal-tab-content active" id="tab-info">
         <div class="form-grid">
-          <div class="form-group">
+          <div class="form-group" id="fg-name">
             <label>Nombre del cliente *</label>
-            <input class="form-input" id="f-name" placeholder="Ej. Agrícola XYZ">
+            <input class="form-input" id="f-name" placeholder="Ej. Agrícola XYZ" oninput="clearFieldError('fg-name')">
+            <div class="form-error-text">El nombre del cliente es obligatorio</div>
           </div>
           <div class="form-group">
             <label>Campo / Predio</label>
@@ -1053,13 +1185,15 @@
       <!-- TAB: COMERCIAL -->
       <div class="modal-tab-content" id="tab-comercial">
         <div class="form-grid">
-          <div class="form-group">
+          <div class="form-group" id="fg-ha">
             <label>Hectáreas *</label>
-            <input class="form-input" type="number" id="f-ha" placeholder="0" min="0" step="0.01" oninput="recalcARR()">
+            <input class="form-input" type="number" id="f-ha" placeholder="0" min="0" step="0.01" oninput="recalcARR();clearFieldError('fg-ha')">
+            <div class="form-error-text">Ingresa las hectáreas del predio</div>
           </div>
-          <div class="form-group">
+          <div class="form-group" id="fg-price">
             <label>Precio USD / Ha / Año *</label>
-            <input class="form-input" type="number" id="f-price" placeholder="0.00" min="0" step="0.01" oninput="recalcARR()">
+            <input class="form-input" type="number" id="f-price" placeholder="0.00" min="0" step="0.01" oninput="recalcARR();clearFieldError('fg-price')">
+            <div class="form-error-text">Ingresa el precio por hectárea</div>
           </div>
           <div class="form-group full">
             <label>ARR y MRR calculados automáticamente</label>
@@ -1098,6 +1232,15 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- MOBILE NAV -->
+<nav class="mobile-nav" id="mobile-nav">
+  <button class="mobile-nav-item active" onclick="mobileNav('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>Dash</button>
+  <button class="mobile-nav-item" onclick="mobileNav('pipeline',this)"><svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Pipeline</button>
+  <button class="mobile-nav-item" onclick="mobileNav('clientes',this)"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Clientes</button>
+  <button class="mobile-nav-item" onclick="mobileNav('global',this)"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>Global</button>
+  <button class="mobile-nav-item" onclick="mobileNav('reuniones',this)"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Reuniones</button>
+</nav>
 
 <!-- ============================================================
      JAVASCRIPT
@@ -1436,7 +1579,7 @@ function renderBaumSystem() {
               <div style="font-size:11px;color:var(--gray-400)">ARR anual</div>
             </div>
             <div style="text-align:center;padding:10px 16px;background:#f8fffe;border-radius:10px;border:1px solid var(--green-accent)">
-              <div style="font-size:20px;font-weight:800;color:#8e44ad">$${bs.pricePerHaYear}/ha/año</div>
+              <div style="font-size:20px;font-weight:800;color:var(--gray-800)">$${bs.pricePerHaYear}/ha/año</div>
               <div style="font-size:11px;color:var(--gray-400)">Tarifa BaumApp</div>
             </div>
             ${bs.startDate?`<div style="text-align:center;padding:10px 16px;background:#f0fff4;border-radius:10px"><div style="font-size:15px;font-weight:700;color:var(--green-mid)">${bs.startDate}</div><div style="font-size:11px;color:var(--gray-400)">Inicio contrato</div></div>`:''}
@@ -1680,12 +1823,12 @@ function calcTariff() {
         <div style="background:white;border-radius:8px;padding:10px;border:1px solid #d1fae5">
           <div style="font-size:10px;color:var(--gray-500);margin-bottom:2px">ARR anual</div>
           <div style="font-size:17px;font-weight:800;color:var(--green-dark)">$${arr.toLocaleString('en-US')} USD</div>
-          <div style="font-size:10px;color:#7c6f99;margin-top:2px">≈ ${fmtCLP(arr)}</div>
+          <div style="font-size:10px;color:var(--gray-400);margin-top:2px">≈ ${fmtCLP(arr)}</div>
         </div>
         <div style="background:white;border-radius:8px;padding:10px;border:1px solid #d1fae5">
           <div style="font-size:10px;color:var(--gray-500);margin-bottom:2px">MRR mensual</div>
           <div style="font-size:17px;font-weight:800;color:var(--green-dark)">$${Math.round(mrr).toLocaleString('en-US')} USD</div>
-          <div style="font-size:10px;color:#7c6f99;margin-top:2px">≈ ${fmtCLP(mrr)}</div>
+          <div style="font-size:10px;color:var(--gray-400);margin-top:2px">≈ ${fmtCLP(mrr)}</div>
         </div>
       </div>
       <div style="margin-top:10px;padding:8px 12px;background:var(--green-light);border-radius:8px;font-size:12px;color:var(--green-dark);width:100%;box-sizing:border-box">
@@ -1836,8 +1979,8 @@ function renderTable() {
       <td onclick="openEditModal(${c.id})">${c.country}${c.region?`<br><span style="font-size:11px;color:var(--gray-400)">${c.region}</span>`:''}</td>
       <td onclick="openEditModal(${c.id})">${fmtHa(c.hectares)}</td>
       <td onclick="openEditModal(${c.id})">$${c.pricePerHaYear.toFixed(2)}</td>
-      <td onclick="openEditModal(${c.id})"><strong>${fmt(c.arr)}</strong><br><span style="font-size:11px;color:#7c6f99;font-weight:600">${fmtCLP(c.arr)}</span></td>
-      <td onclick="openEditModal(${c.id})">${fmt(c.mrr)}<br><span style="font-size:11px;color:#7c6f99;font-weight:600">${fmtCLP(c.mrr)}</span></td>
+      <td onclick="openEditModal(${c.id})"><strong>${fmt(c.arr)}</strong><br><span style="font-size:11px;color:var(--gray-400);font-weight:600">${fmtCLP(c.arr)}</span></td>
+      <td onclick="openEditModal(${c.id})">${fmt(c.mrr)}<br><span style="font-size:11px;color:var(--gray-400);font-weight:600">${fmtCLP(c.mrr)}</span></td>
       <td onclick="openEditModal(${c.id})"><span class="badge ${c.type==='B2B'?'badge-b2b':'badge-b2c'}">${c.type}</span></td>
       <td onclick="openEditModal(${c.id})"><span class="status-badge ${sc(c.status)}"><span class="dot ${sc(c.status)}"></span>${c.status}</span></td>
       <td onclick="openEditModal(${c.id})" style="font-size:12px;color:var(--gray-400)">${c.startDate||'—'}</td>
@@ -2429,6 +2572,252 @@ if (sessionStorage.getItem('baum_auth') !== '1') {
 // ─── INIT ────────────────────────────────────────────────────
 document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('es-CL',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 document.getElementById('fx-rate').value = fxRate;
+renderDashboard();
+
+// ─── MOBILE NAV ──────────────────────────────────────────────
+function mobileNav(viewId, btn) {
+  document.querySelectorAll('.mobile-nav-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  showView(viewId);
+}
+
+// ─── SORTABLE TABLE ──────────────────────────────────────────
+let sortField = null, sortDir = 'asc';
+function sortTable(field, thEl) {
+  if (sortField === field) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  else { sortField = field; sortDir = 'asc'; }
+  document.querySelectorAll('#clients-table th.sortable').forEach(th => { th.classList.remove('asc','desc'); });
+  thEl.classList.add(sortDir);
+  renderTable();
+}
+
+// Override renderTable to add sorting
+const _origRenderTable = renderTable;
+renderTable = function() {
+  let list = clients.filter(c => {
+    if (activeFilter==='todos') return true;
+    if (activeFilter==='B2B'||activeFilter==='B2C') return c.type===activeFilter;
+    return c.status===activeFilter;
+  }).filter(c => !searchTerm || c.name.toLowerCase().includes(searchTerm.toLowerCase()) || c.country.toLowerCase().includes(searchTerm.toLowerCase()));
+
+  if (sortField) {
+    list.sort((a,b) => {
+      let va = a[sortField], vb = b[sortField];
+      if (typeof va === 'string') va = (va||'').toLowerCase();
+      if (typeof vb === 'string') vb = (vb||'').toLowerCase();
+      if (va == null) va = '';
+      if (vb == null) vb = '';
+      const cmp = va < vb ? -1 : va > vb ? 1 : 0;
+      return sortDir === 'asc' ? cmp : -cmp;
+    });
+  }
+
+  document.getElementById('clients-empty').style.display = list.length ? 'none' : 'block';
+  document.getElementById('clients-tbody').innerHTML = list.map(c=>`
+    <tr>
+      <td onclick="openEditModal(${c.id})" style="cursor:pointer">
+        <strong>${c.name}</strong>
+        ${c.field&&c.field!=='—'?`<br><span style="font-size:11px;color:var(--gray-400)">${c.field}</span>`:''}
+      </td>
+      <td onclick="openEditModal(${c.id})">${c.country}${c.region?`<br><span style="font-size:11px;color:var(--gray-400)">${c.region}</span>`:''}</td>
+      <td onclick="openEditModal(${c.id})">${fmtHa(c.hectares)}</td>
+      <td onclick="openEditModal(${c.id})">$${c.pricePerHaYear.toFixed(2)}</td>
+      <td onclick="openEditModal(${c.id})"><strong>${fmt(c.arr)}</strong><br><span style="font-size:11px;color:var(--gray-400);font-weight:600">${fmtCLP(c.arr)}</span></td>
+      <td onclick="openEditModal(${c.id})">${fmtCLP(c.arr)}</td>
+      <td onclick="openEditModal(${c.id})">${fmt(c.mrr)}<br><span style="font-size:11px;color:var(--gray-400);font-weight:600">${fmtCLP(c.mrr)}</span></td>
+      <td onclick="openEditModal(${c.id})">${fmtCLP(c.mrr)}</td>
+      <td onclick="openEditModal(${c.id})"><span class="badge ${c.type==='B2B'?'badge-b2b':'badge-b2c'}">${c.type}</span></td>
+      <td onclick="openEditModal(${c.id})"><span class="status-badge ${sc(c.status)}"><span class="dot ${sc(c.status)}"></span>${c.status}</span></td>
+      <td onclick="openEditModal(${c.id})" style="font-size:12px;color:var(--gray-400)">${c.startDate||'—'}</td>
+      <td>
+        <button onclick="openEditModal(${c.id})" title="Editar" style="background:var(--green-pale);border:none;border-radius:6px;padding:5px 10px;cursor:pointer;font-size:11px;font-weight:600;color:var(--green-dark)">Editar</button>
+      </td>
+    </tr>
+  `).join('');
+};
+
+// ─── EXPORT CSV ──────────────────────────────────────────────
+function exportClientsCSV() {
+  const headers = ['Nombre','Campo','País','Región','Tipo','Estado','Ha','$/Ha/Año','ARR USD','MRR USD','Inicio','Avance %','Notas'];
+  const rows = clients.map(c => [
+    c.name, c.field, c.country, c.region||'', c.type, c.status,
+    c.hectares, c.pricePerHaYear, c.arr.toFixed(2), c.mrr.toFixed(2),
+    c.startDate||'', c.progress, (c.notes||'').replace(/"/g,'""')
+  ]);
+  const csv = [headers.join(','), ...rows.map(r => r.map(v => `"${v}"`).join(','))].join('\n');
+  const BOM = '\uFEFF';
+  const blob = new Blob([BOM + csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `BaumApp_Clientes_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('CSV exportado');
+}
+
+// ─── FORM VALIDATION ─────────────────────────────────────────
+function clearFieldError(groupId) {
+  document.getElementById(groupId)?.classList.remove('has-error');
+}
+function setFieldError(groupId) {
+  document.getElementById(groupId)?.classList.add('has-error');
+}
+
+// Override saveClient to add validation
+const _origSaveClient = saveClient;
+saveClient = function() {
+  let hasError = false;
+  const name = document.getElementById('f-name').value.trim();
+  const ha   = parseFloat(document.getElementById('f-ha').value) || 0;
+  const price= parseFloat(document.getElementById('f-price').value) || 0;
+
+  ['fg-name','fg-ha','fg-price'].forEach(clearFieldError);
+
+  if (!name) { setFieldError('fg-name'); hasError = true; }
+  if (ha <= 0) { setFieldError('fg-ha'); hasError = true; }
+  if (price <= 0) { setFieldError('fg-price'); hasError = true; }
+
+  if (hasError) {
+    if (!name) { switchTab('info'); document.getElementById('f-name').focus(); }
+    else { switchTab('comercial'); document.getElementById(ha<=0?'f-ha':'f-price').focus(); }
+    toast('Completa los campos obligatorios');
+    return;
+  }
+  _origSaveClient();
+};
+
+// ─── NOTIFICATION CENTER ─────────────────────────────────────
+let dismissedNotifs = JSON.parse(localStorage.getItem('baum_dismissed_notifs') || '[]');
+
+function toggleNotifPanel(e) {
+  e.stopPropagation();
+  document.getElementById('notif-panel').classList.toggle('open');
+}
+document.addEventListener('click', (e) => {
+  const panel = document.getElementById('notif-panel');
+  const bell = document.getElementById('notif-bell');
+  if (panel && !panel.contains(e.target) && !bell.contains(e.target)) {
+    panel.classList.remove('open');
+  }
+});
+
+function generateNotifications() {
+  const notifs = [];
+  const now = new Date();
+
+  clients.forEach(c => {
+    if (c.status === 'Prospecto' || c.status === 'Piloto') {
+      const mts = meetings[c.id] || [];
+      const gMts = globalMtgs.filter(m => m.clientId === c.id);
+      const allMts = [...mts, ...gMts];
+      if (allMts.length === 0) {
+        notifs.push({id:'no-mtg-'+c.id, type:'warn', icon:'⏰', text:`<strong>${c.name}</strong> (${c.status}) sin reuniones registradas.`, sub:'Agenda un primer seguimiento'});
+      } else {
+        const lastDate = allMts.map(m => m.date).filter(Boolean).sort().reverse()[0];
+        if (lastDate) {
+          const diff = Math.floor((now - new Date(lastDate)) / 86400000);
+          if (diff > 14) notifs.push({id:'old-mtg-'+c.id, type:'warn', icon:'⏰', text:`<strong>${c.name}</strong> sin contacto hace ${diff} días.`, sub:'Última reunión: '+lastDate});
+        }
+      }
+    }
+  });
+
+  clients.filter(c => c.status==='Piloto' && !c.startDate).forEach(c => {
+    notifs.push({id:'no-date-'+c.id, type:'info', icon:'📋', text:`<strong>${c.name}</strong> es piloto sin fecha de inicio.`, sub:'Definir fecha para seguimiento'});
+  });
+
+  actions.filter(a => !a.done && a.date && new Date(a.date) < now).forEach((a,i) => {
+    notifs.push({id:'action-'+i+'-'+a.date, type:'danger', icon:'🔴', text:`Acción vencida: <strong>${a.client}</strong>`, sub:a.note+' — '+a.date});
+  });
+
+  const ac = clients.filter(c => c.status==='Activo');
+  const totalARR = ac.reduce((s,c) => s+c.arr, 0);
+  ac.forEach(c => {
+    const pct = totalARR > 0 ? Math.round(c.arr / totalARR * 100) : 0;
+    if (pct >= 60) notifs.push({id:'conc-'+c.id, type:'danger', icon:'⚠️', text:`<strong>${c.name}</strong> concentra el ${pct}% del ARR.`, sub:'Diversificar reduce el riesgo'});
+  });
+
+  return notifs.filter(n => !dismissedNotifs.includes(n.id));
+}
+
+function renderNotifications() {
+  const notifs = generateNotifications();
+  const badge = document.getElementById('notif-badge');
+  const list = document.getElementById('notif-list');
+  if (!badge || !list) return;
+  badge.textContent = notifs.length || '';
+  badge.setAttribute('data-count', notifs.length);
+  if (!notifs.length) {
+    list.innerHTML = '<div class="notif-empty"><div class="notif-empty-icon">🔔</div>Sin notificaciones pendientes.<br>¡Todo al día!</div>';
+    return;
+  }
+  list.innerHTML = notifs.map(n => `
+    <div class="notif-item" id="notif-${n.id}">
+      <div class="notif-icon ${n.type}">${n.icon}</div>
+      <div class="notif-body">
+        <div class="notif-text">${n.text}</div>
+        <div class="notif-time">${n.sub}</div>
+      </div>
+      <button class="notif-dismiss" onclick="dismissNotif('${n.id}')" title="Marcar leída">✕</button>
+    </div>`).join('');
+}
+
+function dismissNotif(id) {
+  dismissedNotifs.push(id);
+  localStorage.setItem('baum_dismissed_notifs', JSON.stringify(dismissedNotifs));
+  const el = document.getElementById('notif-'+id);
+  if (el) {
+    el.style.transition = 'all 0.25s ease';
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(20px)';
+    el.style.maxHeight = el.offsetHeight + 'px';
+    setTimeout(() => { el.style.maxHeight = '0'; el.style.padding = '0 16px'; el.style.borderBottom = 'none'; setTimeout(() => renderNotifications(), 200); }, 200);
+  } else renderNotifications();
+}
+
+function clearAllNotifs() {
+  generateNotifications().forEach(n => dismissedNotifs.push(n.id));
+  localStorage.setItem('baum_dismissed_notifs', JSON.stringify(dismissedNotifs));
+  renderNotifications();
+  document.getElementById('notif-panel').classList.remove('open');
+  toast('Notificaciones marcadas como leídas');
+}
+
+// Reset dismissed daily
+(function() {
+  const last = localStorage.getItem('baum_notif_reset');
+  const today = new Date().toISOString().slice(0,10);
+  if (last !== today) { dismissedNotifs = []; localStorage.setItem('baum_dismissed_notifs','[]'); localStorage.setItem('baum_notif_reset', today); }
+})();
+
+// ─── SNAPSHOT (WEEK COMPARISON) ──────────────────────────────
+function getSnapshotData() {
+  const ac = clients.filter(c=>c.status==='Activo'), pi = clients.filter(c=>c.status==='Piloto'), pr = clients.filter(c=>c.status==='Prospecto');
+  return { date: new Date().toISOString().slice(0,10), totalClients: clients.length, activeClients: ac.length, pilotClients: pi.length, prospectClients: pr.length, haActive: ac.reduce((s,c)=>s+c.hectares,0), haPilot: pi.reduce((s,c)=>s+c.hectares,0), haProspect: pr.reduce((s,c)=>s+c.hectares,0), arrActive: ac.reduce((s,c)=>s+c.arr,0), arrTotal: clients.reduce((s,c)=>s+c.arr,0) };
+}
+function takeSnapshot() {
+  const snaps = JSON.parse(localStorage.getItem('baum_snapshots')||'[]');
+  snaps.push(getSnapshotData());
+  while (snaps.length > 52) snaps.shift();
+  localStorage.setItem('baum_snapshots', JSON.stringify(snaps));
+  toast('Snapshot guardado: ' + snaps[snaps.length-1].date);
+  renderSnapshotComparison();
+}
+function renderSnapshotComparison() {
+  const snaps = JSON.parse(localStorage.getItem('baum_snapshots')||'[]');
+  const infoEl = document.getElementById('snap-info'), deltasEl = document.getElementById('snap-deltas');
+  if (!infoEl||!deltasEl) return;
+  if (!snaps.length) { infoEl.textContent = 'Sin snapshots guardados aún.'; deltasEl.innerHTML = ''; return; }
+  const prev = snaps[snaps.length-1], curr = getSnapshotData();
+  infoEl.textContent = `Último: ${prev.date} (${snaps.length} guardados)`;
+  function d(label, c, p, pre='', suf='') { const diff=c-p, cls=diff>0?'up':diff<0?'down':'neutral', sign=diff>0?'+':''; return `<span class="snap-delta ${cls}">${label}: ${sign}${pre}${Number.isInteger(diff)?diff:diff.toFixed(1)}${suf}</span>`; }
+  deltasEl.innerHTML = [d('Ha activas',curr.haActive,prev.haActive,'','ha'), d('Ha piloto',curr.haPilot,prev.haPilot,'','ha'), d('Clientes',curr.totalClients,prev.totalClients), d('ARR',curr.arrActive,prev.arrActive,'$')].join('');
+}
+
+// ─── PATCH renderDashboard ───────────────────────────────────
+const _origRenderDashboard = renderDashboard;
+renderDashboard = function() { _origRenderDashboard(); renderNotifications(); renderSnapshotComparison(); };
 renderDashboard();
 </script>
 </body>

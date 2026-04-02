@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BaumApp CRM Pipeline</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+  <style>
+    :root { --primary:#2d6a4f; --sidebar-bg:#1b4332; --success:#40916c; --lost:#e44258; --warning:#fdab3d; --bg:#f6f7fb; --card-bg:#fff; --text-dark:#323338; --text-gray:#8b95a5; --border:#dce1e6; --shadow:0 2px 8px rgba(0,0,0,.08); --shadow-md:0 4px 12px rgba(0,0,0,.12); }
+    *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text-dark);line-height:1.5}
+    .app{display:flex;height:100vh}
+    .login-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,var(--sidebar-bg) 0%,#1f2333 100%);display:flex;align-items:center;justify-content:center;z-index:9999}
+    .login-box{background:white;border-radius:16px;padding:48px;box-shadow:var(--shadow-md);width:100%;max-width:360px}
+    .login-box h1{font-size:28px;font-weight:800;margin-bottom:8px;color:var(--sidebar-bg)}
+    .login-box p{font-size:13px;color:var(--text-gray);margin-bottom:24px}
+    .login-form{display:flex;flex-direction:column;gap:14px}
+    .login-form input{padding:12px 14px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:14px;transition:border-color .2s}
+    .login-form input:focus{outline:none;border-color:var(--primary)}
+    .login-btn{padding:12px 16px;background:var(--primary);color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;transition:background .2s}
+    .login-btn:hover{background:#1b4332}
+    #login-error{font-size:12px;color:var(--lost);min-height:16px}
+    .sidebar{width:240px;background:var(--sidebar-bg);color:white;padding:20px 0;overflow-y:auto;display:flex;flex-direction:column}
+    .sidebar-header{padding:0 16px 20px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:16px}
+    .sidebar-logo{font-size:18px;font-weight:800;letter-spacing:-.5px}
+    .sidebar-nav{flex:1;display:flex;flex-direction:column;gap:4px;padding:0 8px}
+    .nav-item{padding:12px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:rgba(255,255,255,.7);transition:all .2s;border:none;background:none;text-align:left;width:100%}
+    .nav-item:hover{background:rgba(255,255,255,.1);color:white}
+    .nav-item.active{background:var(--primary);color:white;font-weight:600}
+    .sidebar-footer{padding:16px;border-top:1px solid rgba(255,255,255,.1);margin-top:auto}
+    .logout-btn{width:100%;padding:10px;background:rgba(255,255,255,.1);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;transition:background .2s}
+    .logout-btn:hover{background:rgba(255,255,255,.2)}
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:white;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:12px}
+    .topbar-left{display:flex;align-items:center;gap:16px}
+    .topbar-search{flex:1;min-width:200px;max-width:300px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px}
+    .topbar-right{display:flex;align-items:center;gap:12px}
+    .topbar-badge{font-size:11px;font-weight:700;padding:4px 10px;background:var(--warning);color:white;border-radius:6px}
+    .btn{padding:8px 14px;background:var(--primary);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;transition:background .2s;font-family:inherit}
+    .btn:hover{background:#1b4332}
+    .btn-secondary{background:white;color:var(--primary);border:1px solid var(--primary)}
+    .btn-secondary:hover{background:#f0f7ec}
+    .content{flex:1;display:flex;flex-direction:column;overflow:hidden}
+    .view{display:none;flex:1;overflow-y:auto;padding:24px}
+    .view.active{display:flex;flex-direction:column}
+    .card{background:var(--card-bg);border-radius:12px;padding:20px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.04)}
+    .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .card-title{font-size:16px;font-weight:700;color:var(--text-dark)}
+    .card-subtitle{font-size:12px;color:var(--text-gray);margin-top:4px}
+    .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:20px;margin-bottom:20px}
+    .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:20px}
+    .kpi-card{background:var(--card-bg);border-radius:12px;padding:16px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.04)}
+    .kpi-label{font-size:12px;color:var(--text-gray);font-weight:600;margin-bottom:8px}
+    .kpi-value{font-size:24px;font-weight:800;color:var(--primary);margin-bottom:4px}
+    .kpi-sub{font-size:11px;color:var(--text-gray)}
+    .pipeline-columns{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;flex:1;overflow-x:auto;padding-bottom:16px}
+    .pipeline-col{background:white;border-radius:12px;border:1px solid var(--border);min-height:400px;display:flex;flex-direction:column}
+    .pipeline-col-header{padding:16px;border-bottom:1px solid var(--border);font-weight:700;color:white;border-radius:12px 12px 0 0;display:flex;align-items:center;justify-content:space-between}
+    .pipeline-col-title{font-size:13px}
+    .pipeline-col-count{font-size:11px;opacity:.9}
+    .pipeline-col-body{flex:1;padding:12px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+    .deal-card{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:12px;cursor:move;transition:all .2s;border-left:4px solid;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+    .deal-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+    .deal-card.dragging{opacity:.5}
+    .deal-name{font-weight:600;font-size:13px;margin-bottom:6px;color:var(--text-dark)}
+    .deal-info{font-size:11px;color:var(--text-gray);display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+    .deal-badge{font-size:10px;padding:2px 6px;border-radius:4px;background:#f0f0f0;color:#666}
+    .deal-ha{font-weight:700;color:var(--text-dark);font-size:12px}
+    .modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);z-index:1000;align-items:center;justify-content:center;padding:20px}
+    .modal.active{display:flex}
+    .modal-content{background:white;border-radius:16px;box-shadow:var(--shadow-md);width:100%;max-width:600px;max-height:90vh;overflow-y:auto;animation:slideUp .3s ease-out}
+    @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .modal-title{font-size:18px;font-weight:700;color:var(--text-dark)}
+    .modal-close{background:none;border:none;cursor:pointer;font-size:24px;color:var(--text-gray);transition:color .2s}
+    .modal-close:hover{color:var(--text-dark)}
+    .modal-body{padding:24px}
+    .modal-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px}
+    .modal-tab{padding:12px 20px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:600;color:var(--text-gray);border-bottom:3px solid transparent;transition:all .2s;font-family:inherit}
+    .modal-tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+    .modal-tab:hover{color:var(--text-dark)}
+    .tab-content{display:none}
+    .tab-content.active{display:block}
+    .form-group{margin-bottom:16px}
+    .form-label{font-size:12px;font-weight:700;color:var(--text-gray);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.3px}
+    .form-input,.form-select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;transition:border-color .2s}
+    .form-input:focus,.form-select:focus,textarea:focus{outline:none;border-color:var(--primary)}
+    .form-input::placeholder{color:var(--text-gray)}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    thead th{padding:12px 12px;text-align:left;font-weight:700;border-bottom:2px solid var(--border);color:var(--text-dark);background:#f9fafc}
+    tbody td{padding:12px 12px;border-bottom:1px solid #f0f0f0}
+    tbody tr:hover{background:#fafbfc}
+    .status-badge{display:inline-block;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600}
+    .badge-prospecto{background:#ddeef6;color:#4a7fa0}
+    .badge-contactado{background:#d0e8ef;color:#3d7a94}
+    .badge-propuesta{background:#d4ece6;color:#3a7d6f}
+    .badge-piloto{background:#d8f3dc;color:#2d6a4f}
+    .badge-contrato{background:#c5e0c5;color:#1b4332}
+    .badge-activo{background:#1b4332;color:white}
+    .badge-perdido{background:#ffe5e5;color:#d9534f}
+    .stage-bar{display:flex;gap:2px;margin-bottom:20px;height:8px;border-radius:4px;overflow:hidden}
+    .stage-segment{flex:1;background:#e8e8e8;transition:background .3s}
+    .stage-segment.active{background:var(--primary)}
+    .stage-segment.completed{background:var(--success)}
+    .empty-state{text-align:center;padding:40px 20px;color:var(--text-gray);font-size:13px}
+    .filter-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+    .filter-btn{padding:8px 14px;border:1px solid var(--border);background:white;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text-gray);transition:all .2s;font-family:inherit}
+    .filter-btn:hover{border-color:var(--primary);color:var(--primary)}
+    .filter-btn.active{background:var(--primary);color:white;border-color:var(--primary)}
+    .loss-reason-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .reason-btn{padding:10px;border:1px solid var(--border);background:white;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s;font-family:inherit;text-align:center}
+    .reason-btn:hover{border-color:var(--primary)}
+    .reason-btn.selected{background:var(--primary);color:white;border-color:var(--primary)}
+    .platform-switcher{display:flex;gap:6px;padding:0 16px 16px}
+    .platform-btn{flex:1;padding:10px 8px;border:2px solid transparent;border-radius:10px;cursor:pointer;font-size:12px;font-weight:700;text-align:center;transition:all .2s;background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);font-family:inherit}
+    .platform-btn.active{border-color:currentColor;background:rgba(255,255,255,.15);color:white}
+    .platform-btn:hover{background:rgba(255,255,255,.12)}
+    .sync-badge{display:inline-block;font-size:12px;margin-left:4px;opacity:.7}
+    .nav-ico{display:inline-flex;align-items:center;vertical-align:middle}
+    .sidebar-section-label{font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;padding:16px 16px 6px;text-transform:uppercase}
+    @media(max-width:1200px){.pipeline-columns{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}}
+    @media(max-width:768px){.sidebar{width:60px;padding:10px 0}.sidebar-header{display:none}.topbar{padding:12px 16px}.modal-content{width:95vw;max-height:95vh}.grid-2{grid-template-columns:1fr}}
+  </style>
+  </head>
+<body>
+  <div class="app">
+    <div id="login-screen" class="login-screen">
+      <div class="login-box">
+        <h1>BaumApp CRM</h1>
+        <p>Gestión de Pipeline de Ventas</p>
+        <div class="login-form">
+          <input type="email" id="login-user" placeholder="correo@baumsystem.com" onkeypress="if(event.key==='Enter') doLogin()">
+          <input type="password" id="login-pass" placeholder="Contraseña" onkeypress="if(event.key==='Enter') doLogin()">
+          <button class="login-btn" onclick="doLogin()">Ingresar</button>
+          <div id="login-error"></div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">BaumApp</div><div style="font-size:10px;color:rgba(255,255,255,.4);letter-spacing:1px;margin-top:2px">PIPELINE CRM</div>
+        <div class="platform-switcher">
+          <button class="platform-btn active" onclick="switchPlatform('baumapp')" id="platform-btn-ba" style="color:#40916c"><span class="nav-ico" id="ico-ba"></span> BaumApp</button>
+          <button class="platform-btn" onclick="switchPlatform('baumsystem')" id="platform-btn-bs" style="color:#2d6a4f"><span class="nav-ico" id="ico-bs"></span> BaumSystem</button>
+        </div>
+      </div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section-label">BAUMAPP</div>
+        <button class="nav-item active" onclick="showView('dashboard')"><span class="nav-ico" id="nav-ico-dash"></span> Dashboard Ha</button>
+        <button class="nav-item" onclick="showView('pipeline')"><span class="nav-ico" id="nav-ico-pipe"></span> Pipeline</button>
+        <button class="nav-item" onclick="showView('clientes')"><span class="nav-ico" id="nav-ico-cli"></span> Clientes</button>
+        <button class="nav-item" onclick="showView('reuniones')"><span class="nav-ico" id="nav-ico-cal"></span> Reuniones</button>
+        <button class="nav-item" onclick="showView('tarifario')"><span class="nav-ico" id="nav-ico-tar"></span> Tarifario</button>
+        <div class="sidebar-section-label">ANÁLISIS</div>
+        <button class="nav-item" onclick="showView('analisis')"><span class="nav-ico" id="nav-ico-chart"></span> Análisis Global</button>
+        <div class="sidebar-section-label">ADMIN</div>
+        <button class="nav-item" onclick="showView('usuarios')"><span class="nav-ico" id="nav-ico-usr"></span> Usuarios</button>
+      </div>
+      <div class="sidebar-footer">
+        <div style="font-size:10px;color:rgba(255,255,255,.3);padding:0 16px 8px">v2.0 · BaumApp Pipeline</div>
+        <button class="logout-btn" onclick="doLogout()">Cerrar sesión</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="topbar">
+        <div class="topbar-left">
+          <input type="text" class="topbar-search" id="global-search" placeholder="Buscar clientes, reuniones...">
+          <input type="number" id="fx-rate" min="1" placeholder="USD/CLP" oninput="updateFX()" style="width:120px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;">
+          <span style="font-size:11px;color:var(--text-gray);font-weight:600;">USD/CLP</span>
+        </div>
+        <div class="topbar-right">
+          <span class="topbar-badge" id="user-badge">Usuario</span>
+          <button class="btn btn-secondary" onclick="exportContextual()"><span class="nav-ico" id="ico-csv"></span> CSV</button>
+          <button class="btn" onclick="openNewClientModal()">+ Cliente</button>
+        </div>
+      </div>
+      <div id="view-dashboard" class="view active">
+        <div id="ba-dashboard-content">
+          <div class="card" style="margin-bottom:20px">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Pipeline BaumApp — Resumen Ejecutivo</div>
+                <div class="card-subtitle">Estado actual de hectáreas y clientes por etapa</div>
+              </div>
+            </div>
+            <div class="kpi-grid" style="grid-template-columns:repeat(6,1fr)">
+              <div class="kpi-card"><div class="kpi-label">Prospectos</div><div class="kpi-value" id="dash-prospecto-c" style="color:#7fb3d3">—</div><div class="kpi-sub" id="dash-prospecto-ha">— ha</div></div>
+              <div class="kpi-card"><div class="kpi-label">Contactado</div><div class="kpi-value" id="dash-contactado-c" style="color:#5a9bb5">—</div><div class="kpi-sub" id="dash-contactado-ha">— ha</div></div>
+              <div class="kpi-card"><div class="kpi-label">Propuesta</div><div class="kpi-value" id="dash-propuesta-c" style="color:#4a9d8f">—</div><div class="kpi-sub" id="dash-propuesta-ha">— ha</div></div>
+              <div class="kpi-card"><div class="kpi-label">Piloto</div><div class="kpi-value" id="dash-piloto-c" style="color:#40916c">—</div><div class="kpi-sub" id="dash-piloto-ha">— ha</div></div>
+              <div class="kpi-card"><div class="kpi-label">Contrato</div><div class="kpi-value" id="dash-contrato-c" style="color:#2d6a4f">—</div><div class="kpi-sub" id="dash-contrato-ha">— ha</div></div>
+              <div class="kpi-card"><div class="kpi-label">Activo (Ganado)</div><div class="kpi-value" id="dash-activo-c" style="color:#1b4332">—</div><div class="kpi-sub" id="dash-activo-ha">— ha</div></div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="card"><div class="card-header"><div><div class="card-title">Funnel de Conversión</div><div class="card-subtitle">Clientes y hectáreas por etapa</div></div></div><canvas id="funnel-chart" style="max-height:300px"></canvas></div>
+            <div class="card"><div class="card-header"><div class="card-title">Ganadoras vs Perdidas</div></div><canvas id="won-lost-chart" style="max-height:300px"></canvas></div>
+          </div>
+          <div class="grid-2">
+            <div class="card"><div class="card-header"><div class="card-title">Ha por País</div></div><canvas id="country-chart" style="max-height:250px"></canvas></div>
+            <div class="card"><div class="card-header"><div class="card-title">Top 5 Clientes por ARR</div></div><div id="top-arr-list" style="display:flex;flex-direction:column;gap:10px"></div></div>
+          </div>
+          <div class="grid-2">
+            <div class="card"><div class="card-header"><div class="card-title"><span class="nav-ico" id="ico-warn-dash"></span> Próximas Acciones Pendientes</div></div><div id="pending-actions-list" style="display:flex;flex-direction:column;gap:8px"></div></div>
+            <div class="card"><div class="card-header"><div class="card-title"><span class="nav-ico" id="ico-warn-2"></span> Clientes sin Actividad</div></div><div id="inactive-clients-list" style="display:flex;flex-direction:column;gap:8px"></div></div>
+          </div>
+          <div id="targets-section" style="margin-top:20px;display:none">
+            <div class="card" style="margin-bottom:20px">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Metas vs Real — 2026</div>
+                  <div class="card-subtitle">Comparativo mensual de objetivos vs resultados actuales</div>
+                </div>
+              </div>
+              <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)" id="targets-kpis"></div>
+            </div>
+            <div class="grid-2">
+              <div class="card">
+                <div class="card-header"><div class="card-title">Evolución Ha: Meta vs Real</div></div>
+                <canvas id="targets-ha-chart" style="max-height:280px"></canvas>
+              </div>
+              <div class="card">
+                <div class="card-header"><div class="card-title">Evolución MRR: Meta vs Real</div></div>
+                <canvas id="targets-mrr-chart" style="max-height:280px"></canvas>
+              </div>
+            </div>
+            <div class="card" style="margin-top:20px">
+              <div class="card-header"><div class="card-title">Desglose Mensual</div></div>
+              <div style="overflow-x:auto" id="targets-table"></div>
+            </div>
+          </div>
+        </div>
+        <div id="bs-dashboard-content" style="display:none">
+          <div class="card" style="margin-bottom:20px">
+            <div class="card-header">
+              <div>
+                <div class="card-title">BaumSystem — Resumen de Operaciones</div>
+                <div class="card-subtitle">Detalle de clientes y hectáreas bajo gestión</div>
+              </div>
+            </div>
+            <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
+              <div class="kpi-card"><div class="kpi-label">Ha Totales Activas</div><div class="kpi-value" id="bs-dash-total-ha" style="color:#0073ea">—</div></div>
+              <div class="kpi-card"><div class="kpi-label">Clientes Activos</div><div class="kpi-value" id="bs-dash-total-clients" style="color:#0073ea">—</div></div>
+              <div class="kpi-card"><div class="kpi-label">Ha Promedio/Cliente</div><div class="kpi-value" id="bs-dash-avg-ha" style="color:#0073ea">—</div></div>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:20px">
+            <div class="card-header"><div class="card-title">Clientes BaumSystem</div></div>
+            <div style="overflow-x:auto"><table><thead><tr><th>Cliente</th><th>Región</th><th>Hectáreas</th><th>Inicio</th><th>Estado</th></tr></thead><tbody id="bs-clients-detail"></tbody></table></div>
+          </div>
+          <div class="grid-2">
+            <div class="card"><div class="card-header"><div class="card-title">Historial de Hectáreas (31 meses)</div></div><canvas id="bs-dash-history-chart" style="max-height:280px"></canvas></div>
+            <div class="card"><div class="card-header"><div class="card-title">Análisis de Churn</div></div><canvas id="bs-dash-churn-chart" style="max-height:280px"></canvas></div>
+          </div>
+        </div>
+      </div>
+      <div id="view-pipeline" class="view">
+        <div class="filter-bar">
+          <input type="text" id="pipeline-search" placeholder="Buscar en pipeline..." style="max-width:220px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;" oninput="renderPipeline()">
+          <button class="filter-btn active" onclick="setPipelineFilter('todos',this)">Todos</button>
+          <button class="filter-btn" onclick="setPipelineFilter('Directo',this)">Directo</button>
+          <button class="filter-btn" onclick="setPipelineFilter('Distribuidor',this)">Distribuidor</button>
+          <button class="filter-btn" onclick="setPipelineFilter('Chile',this)">Chile</button>
+          <button class="filter-btn" onclick="setPipelineFilter('México',this)">México</button>
+          <button class="filter-btn" onclick="setPipelineFilter('Perú',this)">Perú</button>
+        </div>
+        <div class="pipeline-columns" id="pipeline-columns"></div>
+      </div>
+      <div id="view-clientes" class="view">
+        <div class="filter-bar">
+          <button class="filter-btn active" onclick="filterClients('todos',this)">Todos</button>
+          <button class="filter-btn" onclick="filterClients('Activo',this)">Activos</button>
+          <button class="filter-btn" onclick="filterClients('Piloto',this)">Pilotos</button>
+          <button class="filter-btn" onclick="filterClients('Prospecto',this)">Prospectos</button>
+          <button class="filter-btn" onclick="filterClients('Perdido',this)">Perdidos</button>
+          <input type="text" id="search-input" placeholder="Buscar cliente..." style="padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;flex:1;max-width:300px;" oninput="searchClients(this.value)">
+        </div>
+        <div class="card" style="padding:0;overflow-x:auto;flex:1">
+          <table><thead><tr><th>Cliente</th><th>País</th><th>Ha</th><th>ARR (USD)</th><th>MRR (USD)</th><th>Tipo</th><th>Estado</th><th>Email</th><th>Teléfono</th><th></th></tr></thead><tbody id="clients-tbody"></tbody></table>
+          <div id="clients-empty" class="empty-state" style="display:none">No hay clientes con ese filtro.</div>
+        </div>
+      </div>
+      <div id="view-tarifario" class="view">
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header"><div><div class="card-title">Calculadora de Tarifas</div><div class="card-subtitle">Precio anual por predio — BaumApp (USD/ha/año) o BaumSystem (CLP fijo)</div></div></div>
+          <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap">
+            <div style="display:flex;flex-direction:column;gap:14px;min-width:240px">
+              <div><div class="form-label">Empresa</div><div style="display:flex;gap:8px"><button id="tc-btn-ba" onclick="selectTCCompany('baumapp')" style="flex:1;padding:9px 12px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;background:var(--success);color:white;transition:.2s;font-family:inherit">BaumApp (USD)</button><button id="tc-btn-bs" onclick="selectTCCompany('baumsystem')" style="flex:1;padding:9px 12px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;background:#f0f7ff;color:var(--primary);transition:.2s;font-family:inherit">BaumSystem (CLP)</button></div></div>
+              <div><div class="form-label">Hectáreas del predio</div><input type="number" id="tc-ha" class="form-input" placeholder="Ej: 250" min="1" oninput="calcTariff(); syncImpHa()"></div>
+            </div>
+            <div id="tc-result" style="flex:1;min-width:280px;background:#f7fdf9;border-radius:12px;padding:20px;border:1.5px solid var(--success);min-height:140px;display:flex;align-items:center;justify-content:center"><div style="color:var(--text-gray);font-size:13px;text-align:center">Ingresa las hectáreas para calcular →</div></div>
+            <div id="tc-table" style="min-width:240px"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Cotización con Implementación</div><div class="card-subtitle">Agrega costo de levantamiento a la tarifa anual</div></div></div>
+          <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap">
+            <div style="display:flex;flex-direction:column;gap:14px;min-width:260px">
+              <div><div class="form-label">Hectáreas del predio</div><input type="number" id="imp-ha" class="form-input" placeholder="Se sincroniza arriba" min="1" oninput="calcImplementation()"></div>
+              <div><div class="form-label">Realizado por</div><div style="display:flex;gap:8px;margin-bottom:12px"><button id="imp-btn-cliente" onclick="selectImpResp('cliente')" style="flex:1;padding:7px 10px;border:none;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;background:var(--success);color:white;transition:.2s;font-family:inherit">El cliente</button><button id="imp-btn-baum" onclick="selectImpResp('baumsystem')" style="flex:1;padding:7px 10px;border:none;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;background:#f0f0f0;color:var(--text-gray);transition:.2s;font-family:inherit">BaumSystem</button><button id="imp-btn-otro" onclick="selectImpResp('otro')" style="flex:1;padding:7px 10px;border:none;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;background:#f0f0f0;color:var(--text-gray);transition:.2s;font-family:inherit">Otro</button></div><div id="imp-otro-wrap" style="display:none;margin-bottom:10px"><input id="imp-otro-name" class="form-input" placeholder="Nombre del tercero" style="font-size:12px" oninput="calcImplementation()"></div></div>
+              <div><div class="form-label">Tipo de costo</div><div style="display:flex;gap:8px;margin-bottom:8px"><button id="imp-btn-ha" onclick="selectImpType('por_ha')" style="flex:1;padding:7px 10px;border:none;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;background:var(--primary);color:white;transition:.2s;font-family:inherit">Por ha</button><button id="imp-btn-fijo" onclick="selectImpType('fijo')" style="flex:1;padding:7px 10px;border:none;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;background:#f0f0f0;color:var(--text-gray);transition:.2s;font-family:inherit">Monto fijo</button></div><div class="form-label" id="imp-label-price">Precio levantamiento (USD/ha)</div><input type="number" id="imp-price" class="form-input" placeholder="Ej: 5" min="0" oninput="calcImplementation()"></div>
+            </div>
+            <div id="imp-result" style="flex:1;min-width:300px;background:#f9fafc;border-radius:12px;padding:20px;border:1.5px solid var(--border);min-height:160px;display:flex;align-items:center;justify-content:center"><div style="color:var(--text-gray);font-size:13px;text-align:center">Completa los campos para ver la cotización →</div></div>
+          </div>
+        </div>
+      </div>
+      <div id="view-reuniones" class="view">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Nueva Reunión</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <select id="mtg-client" class="form-select" style="font-size:13px"></select>
+              <input id="mtg-note" class="form-input" placeholder="Descripción / acuerdo...">
+              <div class="form-row">
+                <div class="form-group"><input type="date" id="mtg-date" class="form-input"></div>
+                <div class="form-group"><input type="time" id="mtg-time" class="form-input" value="10:00"></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><select id="mtg-duration" class="form-select"><option value="30">30 min</option><option value="60" selected>1 hora</option><option value="90">1.5 horas</option><option value="120">2 horas</option></select></div>
+                <div class="form-group"><input id="mtg-location" class="form-input" placeholder="Oficina / Google Meet"></div>
+              </div>
+              <button class="btn" onclick="addGlobalMeeting()" style="width:100%">Añadir</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Acciones Pendientes</div></div>
+            <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+              <input id="action-client" class="form-input" placeholder="Cliente..." style="flex:1;min-width:120px">
+              <input type="date" id="action-date" class="form-input" style="flex:0 0 140px">
+              <input id="action-text" class="form-input" placeholder="Acción pendiente..." style="flex:2;min-width:160px">
+              <button class="btn" onclick="addAction()">Añadir</button>
+            </div>
+            <div id="actions-list" style="display:flex;flex-direction:column;gap:8px"></div>
+          </div>
+        </div>
+        <div class="grid-2" style="margin-top:20px">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Historial de Reuniones</div></div>
+            <div id="global-meetings-list" style="display:flex;flex-direction:column;gap:8px"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Acciones Pendientes</div></div>
+            <div id="pending-actions-panel" style="display:flex;flex-direction:column;gap:8px"></div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:20px">
+          <div class="card-header"><div class="card-title">Actividad por Cliente</div></div>
+          <div id="client-activity-list" style="display:flex;flex-direction:column;gap:2px"></div>
+        </div>
+      </div>
+      <div id="view-baumsystem" class="view">
+        <div class="card" style="margin-bottom:20px" id="bs-client-card"></div>
+        <div class="grid-2">
+          <div class="card"><div class="card-header"><div class="card-title">Historial BaumSystem (31 meses)</div></div><canvas id="bs-history-chart" style="max-height:250px"></canvas></div>
+          <div class="card"><div class="card-header"><div class="card-title">Análisis de Churn</div></div><canvas id="bs-churn-chart" style="max-height:250px"></canvas></div>
+        </div>
+      </div>
+      <div id="view-analisis" class="view">
+        <div class="grid-2">
+          <div class="card"><div class="card-header"><div><div class="card-title">ARR Total BaumApp</div><div class="card-subtitle">Ingresos anuales recurrentes</div></div></div><canvas id="arr-chart" style="max-height:250px"></canvas></div>
+          <div class="card"><div class="card-header"><div><div class="card-title">MRR Total BaumApp</div><div class="card-subtitle">Ingresos mensuales recurrentes</div></div></div><canvas id="mrr-chart" style="max-height:250px"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Registro Semanal</div><div class="card-subtitle">Seguimiento de métricas clave</div></div></div>
+          <div style="display:flex;gap:8px;margin-bottom:14px"><input type="date" id="weekly-date" class="form-input" style="flex:0 0 150px"><input type="number" id="weekly-arr" class="form-input" placeholder="ARR" step="0.01"><input type="number" id="weekly-mrr" class="form-input" placeholder="MRR" step="0.01"><input id="weekly-note" class="form-input" placeholder="Notas..."><button class="btn" onclick="addWeeklyLog()">Registrar</button></div>
+          <div id="weekly-log-list"></div>
+        </div>
+      </div>
+      <div id="view-usuarios" class="view">
+        <div class="grid-2">
+          <div class="card"><div class="card-header"><div class="card-title">Usuarios Activos</div></div><div id="user-list" style="display:flex;flex-direction:column;gap:8px"></div></div>
+          <div class="card"><div class="card-header"><div class="card-title">Nuevo Usuario</div></div><div style="display:flex;flex-direction:column;gap:12px"><input id="new-user-name" class="form-input" placeholder="Nombre (ej: Berni)" style="font-size:13px"><input id="new-user-email" class="form-input" placeholder="correo@baumsystem.com" type="email" style="font-size:13px"><div id="new-user-pass-display" style="display:none;padding:10px;background:#f0f7ff;border-radius:8px;font-size:12px;color:var(--text-dark)"></div><button class="btn" onclick="addNewUser()">Crear Usuario</button></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="client-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div><div class="modal-title" id="client-modal-title">Cliente</div><div id="stage-bar" class="stage-bar" style="margin-top:12px"></div></div>
+        <button class="modal-close" onclick="closeEditModal()">✕</button>
+      </div>
+      <div class="modal-tabs">
+        <button class="modal-tab active" onclick="switchClientTab('info')">Información</button>
+        <button class="modal-tab" onclick="switchClientTab('comercial')">Comercial</button>
+        <button class="modal-tab" onclick="switchClientTab('actividad')">Actividad</button>
+        <button class="modal-tab" onclick="switchClientTab('seguimiento')">Seguimiento</button>
+      </div>
+      <div class="modal-body">
+        <div id="tab-info" class="tab-content active">
+          <div class="form-group"><label class="form-label">Nombre del cliente</label><input class="form-input" id="modal-name" placeholder="Nombre"></div>
+          <div class="form-row"><div class="form-group"><label class="form-label">País</label><select class="form-select" id="modal-country"><option>Chile</option><option>México</option><option>Perú</option></select></div><div class="form-group"><label class="form-label">Región</label><input class="form-input" id="modal-region" placeholder="Región o ciudad"></div></div>
+          <div class="form-row"><div class="form-group"><label class="form-label">Email</label><input class="form-input" id="modal-email" placeholder="correo@ejemplo.com" type="email"></div><div class="form-group"><label class="form-label">Teléfono</label><input class="form-input" id="modal-phone" placeholder="+56 9 1234 5678"></div></div>
+          <div class="form-row"><div class="form-group"><label class="form-label">Tipo de cliente</label><select class="form-select" id="modal-type"><option>Directo</option><option>Distribuidor</option></select></div><div class="form-group"><label class="form-label">Campo/Predio</label><input class="form-input" id="modal-field" placeholder="Nombre del predio"></div></div>
+        </div>
+        <div id="tab-comercial" class="tab-content">
+          <div class="form-row"><div class="form-group"><label class="form-label">Hectáreas</label><input class="form-input" id="modal-hectares" type="number" placeholder="250" step="0.01"></div><div class="form-group"><label class="form-label">Precio por Ha/Año (USD)</label><input class="form-input" id="modal-price" type="number" placeholder="15" step="0.01"></div></div>
+          <div class="form-row"><div class="form-group"><label class="form-label">ARR (USD)</label><input class="form-input" id="modal-arr" type="number" placeholder="3750" step="0.01" readonly></div><div class="form-group"><label class="form-label">MRR (USD)</label><input class="form-input" id="modal-mrr" type="number" placeholder="312.5" step="0.01" readonly></div></div>
+          <div class="form-group"><label class="form-label">Levantamiento realizado por</label><div style="display:flex;gap:8px"><button id="modal-imp-cliente" class="reason-btn" style="flex:1" onclick="selectClientImpResp('cliente')">El cliente</button><button id="modal-imp-baum" class="reason-btn" style="flex:1" onclick="selectClientImpResp('baumsystem')">BaumSystem</button><button id="modal-imp-otro" class="reason-btn" style="flex:1" onclick="selectClientImpResp('otro')">Otro</button></div><div id="modal-imp-otro-wrap" style="display:none;margin-top:8px"><input class="form-input" id="modal-imp-otro-name" placeholder="Nombre del tercero"></div></div>
+          <div class="form-group"><label class="form-label">Fecha de Inicio</label><input class="form-input" id="modal-start-date" type="date"></div>
+          <div class="form-group"><label class="form-label">Notas Comerciales</label><input class="form-input" id="modal-notes" placeholder="Información relevante..."></div>
+        </div>
+        <div id="tab-actividad" class="tab-content">
+          <div class="form-group" style="margin-bottom:20px">
+            <label class="form-label">Nueva Interacción</label>
+            <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+              <button class="reason-btn" style="flex:1;min-width:90px" onclick="selectInteractionType('llamada')"><span class="nav-ico" id="ico-int-phone"></span> Llamada</button>
+              <button class="reason-btn" style="flex:1;min-width:90px" onclick="selectInteractionType('email')"><span class="nav-ico" id="ico-int-email"></span> Email</button>
+              <button class="reason-btn" style="flex:1;min-width:90px" onclick="selectInteractionType('reunión')"><span class="nav-ico" id="ico-int-meet"></span> Reunión</button>
+              <button class="reason-btn" style="flex:1;min-width:90px" onclick="selectInteractionType('nota')"><span class="nav-ico" id="ico-int-note"></span> Nota</button>
+            </div>
+            <div class="form-row"><div class="form-group" style="flex:2"><input class="form-input" id="modal-interaction-desc" placeholder="Descripción de la interacción" ></div><div class="form-group"><input class="form-input" id="modal-interaction-date" type="date"></div></div>
+            <button class="btn" style="width:100%" onclick="addInteraction()">Agregar</button>
+          </div>
+          <div style="border-top:1px solid var(--border);padding-top:16px">
+            <label class="form-label">Timeline de Actividad</label>
+            <div id="interactions-timeline" style="display:flex;flex-direction:column;gap:16px;margin-top:12px"></div>
+          </div>
+        </div>
+        <div id="tab-seguimiento" class="tab-content">
+          <div class="form-group"><label class="form-label">Próxima Acción</label><div class="form-row"><div class="form-group"><input class="form-input" id="modal-next-action" placeholder="Descripción de la acción"></div><div class="form-group"><input class="form-input" id="modal-next-action-date" type="date"></div></div><button class="btn" style="margin-bottom:16px;width:100%" onclick="saveNextAction()">Guardar Acción</button></div>
+          <div class="form-group"><label class="form-label">Estado Actual</label><div id="status-buttons" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px"></div></div>
+          <div class="form-group" style="margin-top:20px"><label class="form-label">Historial de Estados</label><div id="status-history" style="display:flex;flex-direction:column;gap:6px"></div></div>
+          <div style="display:flex;gap:8px;margin-top:20px;border-top:1px solid var(--border);padding-top:16px">
+            <button class="btn" onclick="saveClientModal()">Guardar</button>
+            <button class="btn btn-secondary" onclick="markAsLost()">Marcar como Perdido</button>
+            <button class="btn btn-secondary" style="background:#ffebee;color:var(--lost);border-color:var(--lost)" onclick="deleteClient()">Eliminar Cliente</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="loss-modal" class="modal">
+    <div class="modal-content" style="max-width:450px">
+      <div class="modal-header">
+        <div class="modal-title">Marcar como Perdido</div>
+        <button class="modal-close" onclick="closeLossModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Razón de pérdida</label>
+          <div class="loss-reason-grid">
+            <button class="reason-btn" onclick="selectLossReason('Precio')">Precio</button>
+            <button class="reason-btn" onclick="selectLossReason('Competencia')">Competencia</button>
+            <button class="reason-btn" onclick="selectLossReason('No necesita')">No necesita</button>
+            <button class="reason-btn" onclick="selectLossReason('Sin respuesta')">Sin respuesta</button>
+            <button class="reason-btn" onclick="selectLossReason('Otro')">Otro</button>
+          </div>
+          <input type="hidden" id="selected-loss-reason">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notas adicionales</label>
+          <textarea class="form-input" id="loss-notes" placeholder="Detalles sobre la pérdida..."></textarea>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" onclick="confirmLoss()">Confirmar Pérdida</button>
+          <button class="btn btn-secondary" onclick="closeLossModal()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+// Minimalist SVG icons
+const ICO={
+  app:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+  field:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+  leaf:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 17 3.5 19 2c1 2 2 4.5 2 8 0 5.5-4.5 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>',
+  dash:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
+  pipeline:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+  clients:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  tariff:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+  calendar:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+  chart:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+  users:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+  csv:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+  phone:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+  email:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
+  meet:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>',
+  note:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+  warn:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+  target:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+  wrench:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
+  pin:'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+  calSmall:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+  dot_red:'<svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#e44258"/></svg>',
+  dot_orange:'<svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#fdab3d"/></svg>',
+  dot_gray:'<svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#ccc"/></svg>'
+};
+
+// Platform system variables
+let currentPlatform = sessionStorage.getItem('baum_platform') || 'baumapp';
+
+// BaumApp and BaumSystem data storage will be initialized below after constants are defined
+
+// Active references (point to current platform's data) will be initialized below after data loading
+
+// BaumSystem specific stages
+const BS_STAGES=[{id:'Prospecto',label:'Prospecto',color:'#7fb3d3',order:0},{id:'Contactado',label:'Contactado',color:'#5a9bb5',order:1},{id:'Evaluación',label:'Evaluación',color:'#4a9d8f',order:2},{id:'Piloto',label:'Piloto',color:'#40916c',order:3},{id:'Contrato',label:'Contrato',color:'#2d6a4f',order:4},{id:'Activo',label:'Activo',color:'#1b4332',order:5}];
+
+// BaumSystem initial clients
+const BS_INITIAL_CLIENTS=[];
+
+// Platform switch function
+function switchPlatform(platform) {
+  // Save current data
+  if (currentPlatform === 'baumapp') {
+    ba_clients = clients;
+    ba_meetings = meetings;
+    ba_globalMtgs = globalMtgs;
+    ba_actions = actions;
+    ba_weeklyLog = weeklyLog;
+    ba_statusLog = statusLog;
+    ba_interactions = interactions;
+  } else {
+    bs_clients = clients;
+    bs_meetings = meetings;
+    bs_globalMtgs = globalMtgs;
+    bs_actions = actions;
+    bs_weeklyLog = weeklyLog;
+    bs_statusLog = statusLog;
+    bs_interactions = interactions;
+    persistBS();
+  }
+  
+  // Set new platform
+  currentPlatform = platform;
+  sessionStorage.setItem('baum_platform', platform);
+  
+  // Load new platform data
+  if (platform === 'baumapp') {
+    clients = ba_clients;
+    meetings = ba_meetings;
+    globalMtgs = ba_globalMtgs;
+    actions = ba_actions;
+    weeklyLog = ba_weeklyLog;
+    statusLog = ba_statusLog;
+    interactions = ba_interactions;
+    updatePageTitle('BaumApp CRM Pipeline');
+    updatePrimaryColor('#00c875');
+  } else {
+    clients = bs_clients;
+    meetings = bs_meetings;
+    globalMtgs = bs_globalMtgs;
+    actions = bs_actions;
+    weeklyLog = bs_weeklyLog;
+    statusLog = bs_statusLog;
+    interactions = bs_interactions;
+    updatePageTitle('BaumSystem CRM Pipeline');
+    updatePrimaryColor('#0073ea');
+  }
+  
+  // Update sidebar header
+  updateSidebarForPlatform();
+  
+  // Re-render current view
+  render();
+}
+
+function updatePrimaryColor(color) {
+  const style = document.documentElement.style;
+  style.setProperty('--primary', color);
+}
+
+function updatePageTitle(title) {
+  document.querySelector('title').textContent = title;
+}
+
+function updateSidebarForPlatform() {
+  const btnBa = document.getElementById('platform-btn-ba');
+  const btnBs = document.getElementById('platform-btn-bs');
+  
+  if (currentPlatform === 'baumapp') {
+    btnBa.classList.add('active');
+    btnBs.classList.remove('active');
+  } else {
+    btnBa.classList.remove('active');
+    btnBs.classList.add('active');
+  }
+}
+
+// Sync BaumSystem clients to BaumApp as a single global "BaumSystem" record
+function syncToApp() {
+  if (currentPlatform !== 'baumsystem') return;
+
+  // Sum all BS active clients into one global record
+  const activeBS = bs_clients.filter(c => c.status !== 'Perdido');
+  const totalHa = activeBS.reduce((s, c) => s + (c.hectares || 0), 0);
+  const totalClients = activeBS.length;
+
+  // Find or update the "BaumSystem" record in BaumApp
+  let baClient = ba_clients.find(c => c.name === 'BaumSystem');
+
+  if (baClient) {
+    // Update existing BaumSystem record with aggregated data
+    baClient.hectares = totalHa;
+    baClient.notes = 'Cliente ancla. ' + totalClients + ' clientes activos en BaumSystem. [Sincronizado]';
+    if (!baClient.syncedFrom) baClient.syncedFrom = 'baumsystem';
+  }
+  // If no BaumSystem record exists in BA, the initial data already has one
+  // so we don't need to create it. But just in case:
+  if (!baClient) {
+    baClient = {
+      id: Math.max(...ba_clients.map(c => c.id), 0) + 1,
+      name: 'BaumSystem',
+      country: 'Chile',
+      region: 'Nacional',
+      email: '',
+      phone: '',
+      field: 'Varios',
+      type: 'Distribuidor',
+      hectares: totalHa,
+      pricePerHaYear: 7.5,
+      arr: totalHa * 7.5,
+      mrr: (totalHa * 7.5) / 12,
+      status: 'Activo',
+      startDate: '2026-04-01',
+      progress: 100,
+      notes: 'Cliente ancla. ' + totalClients + ' clientes activos en BaumSystem. [Sincronizado]',
+      syncedFrom: 'baumsystem'
+    };
+    ba_clients.push(baClient);
+  }
+
+  // Also update ARR/MRR if BaumSystem record exists
+  if (baClient) {
+    baClient.arr = baClient.hectares * (baClient.pricePerHaYear || 7.5);
+    baClient.mrr = baClient.arr / 12;
+  }
+
+  persistBA();
+}
+
+// Persist BaumApp data
+function persistBA() {
+  localStorage.setItem('ba_baum_clients', JSON.stringify(ba_clients));
+  localStorage.setItem('ba_baum_meetings', JSON.stringify(ba_meetings));
+  localStorage.setItem('ba_baum_gmtgs', JSON.stringify(ba_globalMtgs));
+  localStorage.setItem('ba_baum_actions', JSON.stringify(ba_actions));
+  localStorage.setItem('ba_baum_weekly', JSON.stringify(ba_weeklyLog));
+  localStorage.setItem('ba_baum_statuslog', JSON.stringify(ba_statusLog));
+  localStorage.setItem('ba_baum_interactions', JSON.stringify(ba_interactions));
+}
+
+// Persist BaumSystem data
+function persistBS() {
+  localStorage.setItem('bs_baum_clients', JSON.stringify(bs_clients));
+  localStorage.setItem('bs_baum_meetings', JSON.stringify(bs_meetings));
+  localStorage.setItem('bs_baum_gmtgs', JSON.stringify(bs_globalMtgs));
+  localStorage.setItem('bs_baum_actions', JSON.stringify(bs_actions));
+  localStorage.setItem('bs_baum_weekly', JSON.stringify(bs_weeklyLog));
+  localStorage.setItem('bs_baum_statuslog', JSON.stringify(bs_statusLog));
+  localStorage.setItem('bs_baum_interactions', JSON.stringify(bs_interactions));
+}
+
+const STAGES=[{id:'Prospecto',label:'Prospecto',color:'#7fb3d3',order:0},{id:'Contactado',label:'Contactado',color:'#5a9bb5',order:1},{id:'Propuesta',label:'Propuesta',color:'#4a9d8f',order:2},{id:'Piloto',label:'Piloto',color:'#40916c',order:3},{id:'Contrato',label:'Contrato',color:'#2d6a4f',order:4},{id:'Activo',label:'Activo',color:'#1b4332',order:5}];
+const INITIAL_CLIENTS=[{id:1,name:'BaumSystem',field:'Varios',type:'Distribuidor',country:'Chile',region:'Nacional',hectares:9564.7,pricePerHaYear:7.5,arr:71735.25,mrr:5977.94,status:'Activo',startDate:'2026-04-01',progress:100,notes:'Cliente ancla. Su historial de 31 meses sirve como referencia CHURN para BaumApp.',email:'',phone:''},{id:2,name:'Agr. Campo Bonito',field:'El Tránsito',type:'Directo',country:'Chile',region:null,hectares:15,pricePerHaYear:25,arr:375,mrr:31.25,status:'Activo',startDate:'2025-12-01',progress:100,notes:'',email:'',phone:''},{id:3,name:'Monte Alegre',field:'Agroberries Mx',type:'Directo',country:'México',region:null,hectares:590,pricePerHaYear:15,arr:8850,mrr:737.5,status:'Activo',startDate:'2026-01-01',progress:100,notes:'',email:'',phone:''},{id:4,name:'Huillinco',field:'Ramadilla',type:'Directo',country:'Chile',region:null,hectares:62.72,pricePerHaYear:16.73,arr:1049.56,mrr:87.46,status:'Activo',startDate:'2026-01-01',progress:100,notes:'',email:'',phone:''},{id:5,name:'Agro Socoin',field:'Talca',type:'Directo',country:'Chile',region:'Talca',hectares:361.25,pricePerHaYear:15,arr:5418.75,mrr:451.56,status:'Activo',startDate:'2026-05-01',progress:100,notes:'También cliente BaumSystem. Inicio Mayo 2026.',email:'',phone:''},{id:6,name:'San José',field:'Cerrillo',type:'Directo',country:'Chile',region:'Buin',hectares:140,pricePerHaYear:13.8,arr:1932.41,mrr:161.03,status:'Activo',startDate:'2026-05-01',progress:100,notes:'También cliente BaumSystem. Inicio Mayo 2026.',email:'',phone:''},{id:7,name:'Bafar',field:'—',type:'Directo',country:'México',region:null,hectares:1904,pricePerHaYear:9,arr:17136,mrr:1428,status:'Piloto',startDate:null,progress:40,notes:'',email:'',phone:''},{id:8,name:'BlueGold',field:'—',type:'Directo',country:'Perú',region:null,hectares:400,pricePerHaYear:12,arr:4800,mrr:400,status:'Piloto',startDate:null,progress:40,notes:'',email:'',phone:''},{id:9,name:'AgroBlue',field:'—',type:'Directo',country:'Perú',region:null,hectares:230,pricePerHaYear:15,arr:3450,mrr:287.5,status:'Piloto',startDate:null,progress:40,notes:'',email:'',phone:''},{id:10,name:'Las Mellizas',field:'—',type:'Directo',country:'Chile',region:null,hectares:62,pricePerHaYear:25,arr:1550,mrr:129.17,status:'Prospecto',startDate:null,progress:15,notes:'',email:'',phone:''},{id:11,name:'Agroberries Perú',field:'—',type:'Directo',country:'Perú',region:null,hectares:840,pricePerHaYear:7.5,arr:6300,mrr:525,status:'Prospecto',startDate:null,progress:15,notes:'',email:'',phone:''},{id:12,name:'Carlos Bermudes',field:'—',type:'Distribuidor',country:'Chile',region:null,hectares:2000,pricePerHaYear:7.5,arr:15000,mrr:1250,status:'Prospecto',startDate:null,progress:20,notes:'',email:'',phone:''},{id:13,name:'Smart Drop',field:'—',type:'Distribuidor',country:'México',region:null,hectares:5000,pricePerHaYear:7.5,arr:37500,mrr:3125,status:'Prospecto',startDate:null,progress:10,notes:'',email:'',phone:''},{id:14,name:'WiseConn',field:'—',type:'Distribuidor',country:'Chile',region:null,hectares:5000,pricePerHaYear:7.5,arr:37500,mrr:3125,status:'Prospecto',startDate:null,progress:10,notes:'',email:'',phone:''}];
+const BS_HA=[{p:'Jul 23',ha:325.5},{p:'Ago 23',ha:454.9},{p:'Sep 23',ha:454.9},{p:'Oct 23',ha:606.9},{p:'Nov 23',ha:746.3},{p:'Dic 23',ha:746.3},{p:'Ene 24',ha:746.3},{p:'Feb 24',ha:927.8},{p:'Mar 24',ha:1350.75},{p:'Abr 24',ha:1350.75},{p:'May 24',ha:1350.75},{p:'Jun 24',ha:1823.75},{p:'Jul 24',ha:1823.75},{p:'Ago 24',ha:1823.75},{p:'Sep 24',ha:3275.76},{p:'Oct 24',ha:3253.26},{p:'Nov 24',ha:3299.26},{p:'Dic 24',ha:3369.26},{p:'Ene 25',ha:3875.26},{p:'Feb 25',ha:3948.76},{p:'Mar 25',ha:4178.76},{p:'Abr 25',ha:4578.76},{p:'May 25',ha:4508.76},{p:'Jun 25',ha:4508.76},{p:'Jul 25',ha:5014.76},{p:'Ago 25',ha:8734.76},{p:'Sep 25',ha:9418.76},{p:'Oct 25',ha:9418.76},{p:'Nov 25',ha:9475},{p:'Dic 25',ha:9815},{p:'Ene 26',ha:10126},{p:'Feb 26',ha:9596}];
+const BASE_ARR=[{m:'Dic 25',arr:375,mrr:31},{m:'Ene 26',arr:10275,mrr:856},{m:'Feb 26',arr:10275,mrr:856},{m:'Mar 26',arr:10275,mrr:856},{m:'Abr 26',arr:82009,mrr:6834},{m:'May 26',arr:89362,mrr:7447}];
+const BA_TARIFF_DEFAULT=[{from:1,to:99,price:25,label:'Básico'},{from:100,to:299,price:15,label:'Estándar'},{from:300,to:999,price:12,label:'Premium'},{from:1000,to:999999,price:7.5,label:'Enterprise'}];
+const BS_TARIFF_DEFAULT=[{from:1,to:69,priceCLP:150000,visits:12,cat:'A'},{from:70,to:100,priceCLP:85000,visits:8,cat:'B'},{from:101,to:150,priceCLP:77000,visits:6,cat:'C'},{from:151,to:200,priceCLP:69000,visits:5,cat:'D'},{from:201,to:250,priceCLP:61000,visits:4,cat:'E'},{from:251,to:300,priceCLP:53000,visits:3,cat:'F'},{from:301,to:350,priceCLP:45000,visits:2,cat:'G'}];
+let BA_TARIFF=JSON.parse(localStorage.getItem('ba_tariff'))||JSON.parse(JSON.stringify(BA_TARIFF_DEFAULT));
+let BS_TARIFF=JSON.parse(localStorage.getItem('bs_tariff'))||JSON.parse(JSON.stringify(BS_TARIFF_DEFAULT));
+function saveTariffs(){localStorage.setItem('ba_tariff',JSON.stringify(BA_TARIFF));localStorage.setItem('bs_tariff',JSON.stringify(BS_TARIFF))}
+function resetTariffs(){BA_TARIFF=JSON.parse(JSON.stringify(BA_TARIFF_DEFAULT));BS_TARIFF=JSON.parse(JSON.stringify(BS_TARIFF_DEFAULT));localStorage.removeItem('ba_tariff');localStorage.removeItem('bs_tariff');renderTCTable();calcTariff()}
+const DEFAULT_USERS={
+  'contacto@baumsystem.com':{password:'Baum2025!',name:'BaumApp'},
+  'b.sepulveda@baumsystem.com':{password:'Baum2025!',name:'Berni'}
+};
+
+const MONTHLY_TARGETS_2026=[
+  {month:'2026-04',label:'Abr 26',haNewTarget:0,haTotalTarget:10577,mrrTargetCLP:6054332,mrrTargetUSD:6803,clientsTarget:0},
+  {month:'2026-05',label:'May 26',haNewTarget:590,haTotalTarget:11167,mrrTargetCLP:6522243,mrrTargetUSD:7328,clientsTarget:3},
+  {month:'2026-06',label:'Jun 26',haNewTarget:1083,haTotalTarget:12250,mrrTargetCLP:7381402,mrrTargetUSD:8294,clientsTarget:5},
+  {month:'2026-07',label:'Jul 26',haNewTarget:1083,haTotalTarget:13334,mrrTargetCLP:8240561,mrrTargetUSD:9259,clientsTarget:7},
+  {month:'2026-08',label:'Ago 26',haNewTarget:1083,haTotalTarget:14417,mrrTargetCLP:9099720,mrrTargetUSD:10224,clientsTarget:9},
+  {month:'2026-09',label:'Sep 26',haNewTarget:1083,haTotalTarget:15500,mrrTargetCLP:9958879,mrrTargetUSD:11190,clientsTarget:11},
+  {month:'2026-10',label:'Oct 26',haNewTarget:1083,haTotalTarget:16584,mrrTargetCLP:10818038,mrrTargetUSD:12155,clientsTarget:13},
+  {month:'2026-11',label:'Nov 26',haNewTarget:1083,haTotalTarget:17667,mrrTargetCLP:11677197,mrrTargetUSD:13120,clientsTarget:14},
+  {month:'2026-12',label:'Dic 26',haNewTarget:1083,haTotalTarget:18750,mrrTargetCLP:12536356,mrrTargetUSD:14086,clientsTarget:15}
+];
+
+// Initialize BaumApp data from localStorage
+let ba_clients = JSON.parse(localStorage.getItem('ba_baum_clients')||'null') || JSON.parse(JSON.stringify(INITIAL_CLIENTS));
+let ba_meetings = JSON.parse(localStorage.getItem('ba_baum_meetings')||'{}');
+let ba_globalMtgs = JSON.parse(localStorage.getItem('ba_baum_gmtgs')||'[]');
+let ba_actions = JSON.parse(localStorage.getItem('ba_baum_actions')||'[]');
+let ba_weeklyLog = JSON.parse(localStorage.getItem('ba_baum_weekly')||'[]');
+let ba_statusLog = JSON.parse(localStorage.getItem('ba_baum_statuslog')||'{}');
+let ba_interactions = JSON.parse(localStorage.getItem('ba_baum_interactions')||'{}');
+
+// Initialize BaumSystem data from localStorage (reset if old data with 12 fictitious clients detected)
+let _bsRaw = JSON.parse(localStorage.getItem('bs_baum_clients')||'null');
+if (_bsRaw && _bsRaw.length > 0 && _bsRaw.find(c => c.name === 'Viña Santa Rita' || c.name === 'Hacienda Lonquén')) {
+  localStorage.removeItem('bs_baum_clients'); _bsRaw = null;
+}
+let bs_clients = _bsRaw || JSON.parse(JSON.stringify(BS_INITIAL_CLIENTS));
+let bs_meetings = JSON.parse(localStorage.getItem('bs_baum_meetings')||'{}');
+let bs_globalMtgs = JSON.parse(localStorage.getItem('bs_baum_gmtgs')||'[]');
+let bs_actions = JSON.parse(localStorage.getItem('bs_baum_actions')||'[]');
+let bs_weeklyLog = JSON.parse(localStorage.getItem('bs_baum_weekly')||'[]');
+let bs_statusLog = JSON.parse(localStorage.getItem('bs_baum_statuslog')||'{}');
+let bs_interactions = JSON.parse(localStorage.getItem('bs_baum_interactions')||'{}');
+
+// Set active references based on current platform
+let clients = currentPlatform === 'baumapp' ? ba_clients : bs_clients;
+let meetings = currentPlatform === 'baumapp' ? ba_meetings : bs_meetings;
+let globalMtgs = currentPlatform === 'baumapp' ? ba_globalMtgs : bs_globalMtgs;
+let actions = currentPlatform === 'baumapp' ? ba_actions : bs_actions;
+let weeklyLog = currentPlatform === 'baumapp' ? ba_weeklyLog : bs_weeklyLog;
+let statusLog = currentPlatform === 'baumapp' ? ba_statusLog : bs_statusLog;
+let interactions = currentPlatform === 'baumapp' ? ba_interactions : bs_interactions;
+
+let selectedInteractionType='nota';
+let nextId=Math.max(...(currentPlatform==="baumapp"?ba_clients:bs_clients).map(c=>c.id),0)+1;
+let currentEditingId=null,pipelineSearch='',pipelineFilter='todos',currentFilter='todos',fxRate=parseFloat(localStorage.getItem('baum_fx')||'950'),tcCompany='baumapp',impType='por_ha',impResp='cliente',selectedLossReason='',charts={},currentView='dashboard';
+function persist(){
+  if(currentPlatform==='baumapp'){
+    localStorage.setItem('ba_baum_clients',JSON.stringify(clients));
+    localStorage.setItem('ba_baum_meetings',JSON.stringify(meetings));
+    localStorage.setItem('ba_baum_gmtgs',JSON.stringify(globalMtgs));
+    localStorage.setItem('ba_baum_actions',JSON.stringify(actions));
+    localStorage.setItem('ba_baum_weekly',JSON.stringify(weeklyLog));
+    localStorage.setItem('ba_baum_statuslog',JSON.stringify(statusLog));
+    localStorage.setItem('ba_baum_interactions',JSON.stringify(interactions));
+  }else{
+    localStorage.setItem('bs_baum_clients',JSON.stringify(clients));
+    localStorage.setItem('bs_baum_meetings',JSON.stringify(meetings));
+    localStorage.setItem('bs_baum_gmtgs',JSON.stringify(globalMtgs));
+    localStorage.setItem('bs_baum_actions',JSON.stringify(actions));
+    localStorage.setItem('bs_baum_weekly',JSON.stringify(weeklyLog));
+    localStorage.setItem('bs_baum_statuslog',JSON.stringify(statusLog));
+    localStorage.setItem('bs_baum_interactions',JSON.stringify(interactions));
+    syncToApp();
+  }
+  localStorage.setItem('baum_fx',fxRate.toString());
+}
+function loadAppUsers(){
+  try{
+    const stored=localStorage.getItem('baum_users_v3');
+    if(stored){
+      const parsed=JSON.parse(stored);
+      const keys=Object.keys(parsed);
+      // Validate: at least one key must be an email and have a password field
+      if(keys.length>0&&keys.some(k=>k.includes('@')&&parsed[k]&&parsed[k].password))return parsed;
+    }
+  }catch(e){}
+  // No valid v3 data — start fresh with defaults (merge any custom users from old versions would be lost, but ensures login works)
+  localStorage.setItem('baum_users_v3',JSON.stringify(DEFAULT_USERS));
+  return{...DEFAULT_USERS};
+}
+function saveAppUsers(u){localStorage.setItem('baum_users_v3',JSON.stringify(u))}
+let appUsers=loadAppUsers();
+function checkAuth(){if(!sessionStorage.getItem('baum_auth')){document.getElementById('login-screen').style.display='flex'}else{document.getElementById('login-screen').style.display='none';const name=sessionStorage.getItem('baum_user_name')||sessionStorage.getItem('baum_user')||'Usuario';document.getElementById('user-badge').textContent=name.charAt(0).toUpperCase()+name.slice(1);init()}}
+function doLogin(){
+  const email=document.getElementById('login-user').value.trim().toLowerCase();
+  const pass=document.getElementById('login-pass').value;
+  const err=document.getElementById('login-error');
+  if(!email||!pass){err.textContent='Ingresa correo y contraseña';return}
+  appUsers=loadAppUsers();
+  const userData=appUsers[email];
+  const isValid=userData&&typeof userData==='object'&&userData.password===pass;
+  if(isValid){
+    sessionStorage.setItem('baum_auth','1');
+    sessionStorage.setItem('baum_user',email);
+    sessionStorage.setItem('baum_user_email',email);
+    sessionStorage.setItem('baum_user_name',userData.name||email.split('@')[0]);
+    document.getElementById('login-screen').style.display='none';
+    err.textContent='';
+    checkAuth()
+  } else {
+    err.textContent='Correo o contraseña incorrectos.';
+    document.getElementById('login-pass').value='';
+    document.getElementById('login-pass').focus()
+  }
+}
+function doLogout(){sessionStorage.removeItem('baum_auth');sessionStorage.removeItem('baum_user');sessionStorage.removeItem('baum_user_email');sessionStorage.removeItem('baum_user_name');document.getElementById('login-user').value='';document.getElementById('login-pass').value='';document.getElementById('login-error').textContent='';document.getElementById('login-screen').style.display='flex'}
+function fmt(n){return'$'+(typeof n==='number'?n.toLocaleString('es-CL',{maximumFractionDigits:0}):'—')}
+function fmtNum(n){return typeof n==='number'?n.toLocaleString('es-CL',{maximumFractionDigits:1}):'—'}
+function statusBadgeClass(status){const map={'Prospecto':'badge-prospecto','Contactado':'badge-contactado','Propuesta':'badge-propuesta','Piloto':'badge-piloto','Contrato':'badge-contrato','Activo':'badge-activo','Perdido':'badge-perdido'};return map[status]||'badge-prospecto'}
+function updateFX(){fxRate=parseFloat(document.getElementById('fx-rate').value)||950;persist();render()}
+function showView(viewName){currentView=viewName;document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('view-'+viewName).classList.add('active');document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');if(viewName==='dashboard')renderDashboard();else if(viewName==='pipeline')renderPipeline();else if(viewName==='clientes')renderClients();else if(viewName==='tarifario')renderTarifario();else if(viewName==='reuniones')renderReuniones();else if(viewName==='baumsystem')renderBaumSystem();else if(viewName==='analisis')renderAnalisis();else if(viewName==='usuarios')renderUsersView()}
+function calculateActuals(){const totalHa=clients.filter(c=>c.status!=='Perdido').reduce((s,c)=>s+(c.hectares||0),0);const initialHa=10577;const newHa=totalHa-initialHa;const totalMRR=clients.filter(c=>c.status!=='Perdido').reduce((s,c)=>s+(c.mrr||0),0);const initialClientNames=INITIAL_CLIENTS.map(c=>c.name);const newClientsClosed=clients.filter(c=>(c.status==='Activo'||c.status==='Contrato')&&!initialClientNames.includes(c.name)).length;return{totalHa,newHa,totalMRR,newClientsClosed};}
+function renderTargetsComparison(){if(currentPlatform!=='baumapp'){document.getElementById('targets-section').style.display='none';return;}const now=new Date(),currentMonth=now.toISOString().slice(0,7);const targetData=MONTHLY_TARGETS_2026.find(t=>t.month===currentMonth);if(!targetData){document.getElementById('targets-section').style.display='none';return;}document.getElementById('targets-section').style.display='block';const actuals=calculateActuals();const mrrTargetUSD=targetData.mrrTargetUSD;const completion=(pct)=>pct>=100?'#00c875':pct>=70?'#fdab3d':'#e44258';const kpiHtml=`<div class="kpi-card"><div class="kpi-label">Ha Totales</div><div class="kpi-value" style="color:#0073ea">${fmtNum(actuals.totalHa)}</div><div style="font-size:11px;color:var(--text-gray);margin-bottom:8px">Meta: ${fmtNum(targetData.haTotalTarget)}</div><div style="height:6px;background:#e8e8e8;border-radius:3px;overflow:hidden"><div style="height:100%;background:${completion((actuals.totalHa/targetData.haTotalTarget)*100)};width:${Math.min((actuals.totalHa/targetData.haTotalTarget)*100,100)}%"></div></div></div><div class="kpi-card"><div class="kpi-label">Ha Nuevas (Acum.)</div><div class="kpi-value" style="color:#0073ea">${fmtNum(actuals.newHa)}</div><div style="font-size:11px;color:var(--text-gray);margin-bottom:8px">Meta: ${fmtNum(targetData.haNewTarget)}</div><div style="height:6px;background:#e8e8e8;border-radius:3px;overflow:hidden"><div style="height:100%;background:${completion((actuals.newHa/targetData.haNewTarget)*100)};width:${Math.min((actuals.newHa/targetData.haNewTarget)*100,100)}%"></div></div></div><div class="kpi-card"><div class="kpi-label">MRR Mensual (USD)</div><div class="kpi-value" style="color:#00c875">${fmt(actuals.totalMRR*12/12)}</div><div style="font-size:11px;color:var(--text-gray);margin-bottom:8px">Meta: ${fmt(mrrTargetUSD)}</div><div style="height:6px;background:#e8e8e8;border-radius:3px;overflow:hidden"><div style="height:100%;background:${completion(((actuals.totalMRR*12/12)/mrrTargetUSD)*100)};width:${Math.min(((actuals.totalMRR*12/12)/mrrTargetUSD)*100,100)}%"></div></div></div><div class="kpi-card"><div class="kpi-label">Clientes Nuevos</div><div class="kpi-value" style="color:#00c875">${actuals.newClientsClosed}</div><div style="font-size:11px;color:var(--text-gray);margin-bottom:8px">Meta: ${targetData.clientsTarget}</div><div style="height:6px;background:#e8e8e8;border-radius:3px;overflow:hidden"><div style="height:100%;background:${completion((actuals.newClientsClosed/targetData.clientsTarget)*100)};width:${Math.min((actuals.newClientsClosed/targetData.clientsTarget)*100,100)}%"></div></div></div>`;document.getElementById('targets-kpis').innerHTML=kpiHtml;destroyChart('targets-ha-chart');const months=MONTHLY_TARGETS_2026.map(t=>t.label),targetHas=MONTHLY_TARGETS_2026.map(t=>t.haTotalTarget);charts['targets-ha-chart']=new Chart(document.getElementById('targets-ha-chart'),{type:'line',data:{labels:months,datasets:[{label:'Meta Ha Totales',data:targetHas,borderColor:'#999',borderDash:[5,5],borderWidth:2,fill:false,tension:0.1,pointRadius:3},{label:'Real Ha Totales',data:months.map((m,i)=>actuals.totalHa),borderColor:'#0073ea',borderWidth:2.5,fill:false,tension:0.1,pointRadius:4,pointBackgroundColor:'#0073ea'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{y:{beginAtZero:true}}}});destroyChart('targets-mrr-chart');const targetMRRs=MONTHLY_TARGETS_2026.map(t=>t.mrrTargetUSD);charts['targets-mrr-chart']=new Chart(document.getElementById('targets-mrr-chart'),{type:'line',data:{labels:months,datasets:[{label:'Meta MRR (USD)',data:targetMRRs,borderColor:'#999',borderDash:[5,5],borderWidth:2,fill:false,tension:0.1,pointRadius:3},{label:'Real MRR (USD)',data:months.map((m,i)=>(actuals.totalMRR*12/12)),borderColor:'#00c875',borderWidth:2.5,fill:false,tension:0.1,pointRadius:4,pointBackgroundColor:'#00c875'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{y:{beginAtZero:true}}}});const tableRows=MONTHLY_TARGETS_2026.map((t,i)=>{const pct=t.haTotalTarget>0?(actuals.totalHa/t.haTotalTarget)*100:0;const status=pct>=100?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00c875" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11.5 14.5 16 9.5"/></svg>':pct>=70?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fdab3d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>':'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e44258" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';return`<tr><td style="font-weight:600">${t.label}</td><td>${fmtNum(t.haNewTarget)}</td><td>${fmtNum(actuals.newHa)}</td><td>${fmt(t.mrrTargetUSD)}</td><td>${fmt(actuals.totalMRR*12/12)}</td><td>${t.clientsTarget}</td><td>${actuals.newClientsClosed}</td><td style="text-align:center">${status}</td></tr>`}).join('');const tableHtml=`<table style="font-size:11px"><thead><tr><th>Mes</th><th>Meta Ha Nvas</th><th>Real Ha Nvas</th><th>Meta MRR USD</th><th>Real MRR USD</th><th>Meta Clientes</th><th>Real Clientes</th><th>Estado</th></tr></thead><tbody>${tableRows}</tbody></table>`;document.getElementById('targets-table').innerHTML=tableHtml;}
+function renderDashboard(){if(currentPlatform==='baumsystem'){renderBSDashboard();return;}renderBADashboard()}function renderBADashboard(){document.getElementById('ba-dashboard-content').style.display='flex';document.getElementById('ba-dashboard-content').style.flexDirection='column';document.getElementById('bs-dashboard-content').style.display='none';const stats={};STAGES.forEach(s=>{stats[s.id]={count:0,ha:0}});stats['Perdido']={count:0,ha:0};clients.forEach(c=>{const stat=stats[c.status]||stats['Prospecto'];stat.count++;stat.ha+=c.hectares||0});STAGES.forEach(s=>{const stat=stats[s.id],lcId=s.id.toLowerCase();document.getElementById(`dash-${lcId}-c`).textContent=stat.count;document.getElementById(`dash-${lcId}-ha`).textContent=fmtNum(stat.ha)+' ha'});destroyChart('funnel-chart');const funnelLabels=STAGES.map(s=>s.label),funnelCounts=STAGES.map(s=>stats[s.id].count);charts['funnel-chart']=new Chart(document.getElementById('funnel-chart'),{type:'bar',data:{labels:funnelLabels,datasets:[{label:'Clientes',data:funnelCounts,backgroundColor:STAGES.map(s=>s.color),borderRadius:6}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true}}}});destroyChart('won-lost-chart');const wonCount=stats['Activo'].count,lostCount=stats['Perdido'].count;charts['won-lost-chart']=new Chart(document.getElementById('won-lost-chart'),{type:'doughnut',data:{labels:['Ganados','Perdidos'],datasets:[{data:[wonCount,lostCount],backgroundColor:['#00c875','#e44258'],borderColor:'white',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});destroyChart('country-chart');const countries=[...new Set(clients.map(c=>c.country))],countryData=countries.map(cnt=>clients.filter(c=>c.country===cnt).reduce((s,c)=>s+c.hectares,0));charts['country-chart']=new Chart(document.getElementById('country-chart'),{type:'bar',data:{labels:countries,datasets:[{label:'Ha',data:countryData,backgroundColor:'#579BFC',borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});const topArr=[...clients].sort((a,b)=>(b.arr||0)-(a.arr||0)).slice(0,5);document.getElementById('top-arr-list').innerHTML=topArr.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f9fafc;border-radius:6px"><div><div style="font-weight:600;font-size:13px;color:var(--text-dark)">${c.name}</div><div style="font-size:11px;color:var(--text-gray)">${c.hectares} ha · ${c.country}</div></div><div style="text-align:right"><div style="font-weight:700;font-size:14px;color:var(--primary)">${fmt(c.arr)}</div><div style="font-size:10px;color:var(--text-gray)">ARR anual</div></div></div>`).join('');renderTargetsComparison()}function renderBSDashboard(){document.getElementById('ba-dashboard-content').style.display='none';document.getElementById('bs-dashboard-content').style.display='flex';document.getElementById('bs-dashboard-content').style.flexDirection='column';const allClients=clients.filter(c=>c.status!=='Perdido');const totalHa=allClients.reduce((sum,c)=>sum+(c.hectares||0),0);const totalClients=allClients.length;const avgHa=totalClients>0?totalHa/totalClients:0;document.getElementById('bs-dash-total-ha').textContent=totalClients>0?fmtNum(totalHa):'0';document.getElementById('bs-dash-total-clients').textContent=totalClients;document.getElementById('bs-dash-avg-ha').textContent=totalClients>0?fmtNum(avgHa):'0';const sortedClients=[...allClients].sort((a,b)=>(b.hectares||0)-(a.hectares||0));document.getElementById('bs-clients-detail').innerHTML=totalClients===0?'<tr><td colspan="5" style="text-align:center;color:var(--text-gray);padding:30px">Sin clientes registrados. Usa el Pipeline o la vista Clientes para agregar clientes a BaumSystem.</td></tr>':sortedClients.map(c=>`<tr><td><strong>${c.name}</strong></td><td>${c.region||'—'}</td><td>${fmtNum(c.hectares)}</td><td>${c.startDate||'—'}</td><td><span class="status-badge ${statusBadgeClass(c.status)}">${c.status}</span></td></tr>`).join('');destroyChart('bs-dash-history-chart');charts['bs-dash-history-chart']=new Chart(document.getElementById('bs-dash-history-chart'),{type:'line',data:{labels:BS_HA.map(d=>d.p),datasets:[{label:'Ha BaumSystem',data:BS_HA.map(d=>d.ha),borderColor:'#0073ea',backgroundColor:'rgba(0,115,234,.08)',borderWidth:2,fill:true,tension:.3,pointRadius:3,pointBackgroundColor:'#0073ea'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});destroyChart('bs-dash-churn-chart');const colors=BS_HA.map((d,i,a)=>i>0&&d.ha<a[i-1].ha?'rgba(230,57,70,.75)':'rgba(0,115,234,.65)');charts['bs-dash-churn-chart']=new Chart(document.getElementById('bs-dash-churn-chart'),{type:'bar',data:{labels:BS_HA.map(d=>d.p),datasets:[{label:'Ha BaumSystem',data:BS_HA.map(d=>d.ha),backgroundColor:colors,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}})}
+function renderPipeline(){const filtered=clients.filter(c=>{if(pipelineFilter!=='todos'&&c.country!==pipelineFilter&&c.type!==pipelineFilter)return false;const search=document.getElementById('pipeline-search').value||'';if(search&&!c.name.toLowerCase().includes(search.toLowerCase()))return false;if(c.status==='Perdido')return false;return true}),CURRENT_STAGES=currentPlatform==='baumapp'?STAGES:BS_STAGES,html=CURRENT_STAGES.map(stage=>{const stageClients=filtered.filter(c=>c.status===stage.id);return`<div class="pipeline-col"><div class="pipeline-col-header" style="background:${stage.color}"><div><div class="pipeline-col-title">${stage.label}</div><div class="pipeline-col-count">${stageClients.length} cliente${stageClients.length!==1?'s':''}</div></div></div><div class="pipeline-col-body" ondrop="dropDeal(event,'${stage.id}')" ondragover="allowDrop(event)">${stageClients.map(c=>`<div class="deal-card" draggable="true" ondragstart="dragDeal(event,${c.id})" style="border-left-color:${stage.color};cursor:pointer" onclick="openEditModal(${c.id})"><div class="deal-name">${c.name}</div><div class="deal-info"><span class="deal-badge">${c.country}</span><span class="deal-badge">${c.type}</span></div><div class="deal-ha">${fmtNum(c.hectares)} ha</div><div style="font-size:10px;color:var(--text-gray);margin-top:4px">${fmt(c.arr)}</div>${(stage.order>=3 && c.impResp) ? `<div style="font-size:9px;margin-top:4px;padding:2px 6px;border-radius:4px;display:inline-block;background:${c.impResp==='cliente'?'#d8f3dc':c.impResp==='baumsystem'?'#d4e5f7':'#fff3cd'};color:${c.impResp==='cliente'?'#2d6a4f':c.impResp==='baumsystem'?'#2d6a4f':'#856404'}">${c.impResp==='cliente'?'Lev: Cliente':c.impResp==='baumsystem'?'Lev: BaumSystem':'Lev: '+(c.impRespName||'Otro')}</div>` : ''}${c.email||c.phone?`<div style="font-size:10px;color:var(--text-gray);margin-top:4px">${c.email} ${c.phone}</div>`:''}</div>`).join('')}<button class="btn" style="width:100%;margin-top:12px" onclick="openNewClientModal('${stage.id}')">+ Añadir</button></div></div>`}).join('');document.getElementById('pipeline-columns').innerHTML=html}
+function dragDeal(e,id){e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('clientId',id)}
+function allowDrop(e){e.preventDefault();e.dataTransfer.dropEffect='move'}
+function dropDeal(e,stageId){e.preventDefault();const id=parseInt(e.dataTransfer.getData('clientId')),c=clients.find(cl=>cl.id===id);if(c&&confirm(`Mover "${c.name}" a "${stageId}"?`)){c.status=stageId;recordStatusChange(id,stageId);persist();renderPipeline()}}
+function recordStatusChange(clientId,newStatus){if(!statusLog[clientId])statusLog[clientId]=[];statusLog[clientId].push({status:newStatus,date:new Date().toISOString()})}
+function setPipelineFilter(f,el){pipelineFilter=f;document.querySelectorAll('.filter-bar .filter-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');renderPipeline()}
+function renderClients(){let filtered=clients;if(currentFilter!=='todos')filtered=clients.filter(c=>{if(currentFilter==='Directo'||currentFilter==='Distribuidor')return c.type===currentFilter;return c.status===currentFilter});const tbody=document.getElementById('clients-tbody'),empty=document.getElementById('clients-empty');if(filtered.length===0){tbody.innerHTML='';empty.style.display='block'}else{empty.style.display='none';tbody.innerHTML=filtered.map(c=>`<tr style="cursor:pointer" onclick="openEditModal(${c.id})"><td><strong>${c.name}${c.syncedFrom==='baumsystem'?'<span class="sync-badge">🔄</span>':''}</strong></td><td>${c.country}</td><td>${fmtNum(c.hectares)}</td><td>${fmt(c.arr)}</td><td>${fmt(c.mrr)}</td><td>${c.type}</td><td><span class="status-badge ${statusBadgeClass(c.status)}">${c.status}</span></td><td>${c.email||'—'}</td><td>${c.phone||'—'}</td></tr>`).join('')}}
+function filterClients(f,el){currentFilter=f;document.querySelectorAll('#view-clientes .filter-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');renderClients()}
+function searchClients(term){let filtered=clients.filter(c=>c.name.toLowerCase().includes(term.toLowerCase()));const tbody=document.getElementById('clients-tbody'),empty=document.getElementById('clients-empty');if(filtered.length===0){tbody.innerHTML='';empty.style.display='block'}else{empty.style.display='none';tbody.innerHTML=filtered.map(c=>`<tr><td><strong>${c.name}${c.syncedFrom==='baumsystem'?'<span class="sync-badge">🔄</span>':''}</strong></td><td>${c.country}</td><td>${fmtNum(c.hectares)}</td><td>${fmt(c.arr)}</td><td>${fmt(c.mrr)}</td><td>${c.type}</td><td><span class="status-badge ${statusBadgeClass(c.status)}">${c.status}</span></td><td>${c.email||'—'}</td><td>${c.phone||'—'}</td><td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="openEditModal(${c.id})">Ver</button></td></tr>`).join('')}}
+function openEditModal(id){currentEditingId=id;const c=clients.find(cl=>cl.id===id);if(!c)return;document.getElementById('client-modal-title').innerHTML=c.name+(c.syncedFrom==='baumsystem'?'<span class="sync-badge">🔄</span>':'');const CURRENT_STAGES=currentPlatform==='baumapp'?STAGES:BS_STAGES,stageIndex=CURRENT_STAGES.findIndex(s=>s.id===c.status);document.getElementById('stage-bar').innerHTML=CURRENT_STAGES.map((s,i)=>`<div class="stage-segment ${i<=stageIndex?'completed':''} ${i===stageIndex?'active':''}" style="background:${i<=stageIndex?s.color:'#e8e8e8'}"></div>`).join('');document.getElementById('modal-name').value=c.name||'';document.getElementById('modal-country').value=c.country||'Chile';document.getElementById('modal-region').value=c.region||'';document.getElementById('modal-email').value=c.email||'';document.getElementById('modal-phone').value=c.phone||'';document.getElementById('modal-type').value=c.type||'Directo';document.getElementById('modal-field').value=c.field||'';document.getElementById('modal-hectares').value=c.hectares||'';document.getElementById('modal-price').value=c.pricePerHaYear||'';document.getElementById('modal-arr').value=c.arr||'';document.getElementById('modal-mrr').value=c.mrr||'';document.getElementById('modal-start-date').value=c.startDate||'';document.getElementById('modal-notes').value=c.notes||'';modalImpResp=c.impResp||'cliente';selectClientImpResp(modalImpResp);document.getElementById('modal-imp-otro-name').value=c.impRespName||'';document.getElementById('modal-hectares').oninput=function(){const ha=parseFloat(this.value)||0,price=parseFloat(document.getElementById('modal-price').value)||0;document.getElementById('modal-arr').value=(ha*price).toFixed(2);document.getElementById('modal-mrr').value=(ha*price/12).toFixed(2)};const statusButtons=document.getElementById('status-buttons');const CURRENT_STAGES_SB=currentPlatform==='baumapp'?STAGES:BS_STAGES;statusButtons.innerHTML=CURRENT_STAGES_SB.map(s=>`<button class="btn ${c.status===s.id?'active':''}" style="background:${c.status===s.id?s.color:'#f0f0f0'};color:${c.status===s.id?'white':'var(--text-gray)'}" onclick="setModalStatus('${s.id}')">${s.label}</button>`).join('');const hist=statusLog[id]||[];document.getElementById('status-history').innerHTML=hist.length===0?'<div style="font-size:12px;color:var(--text-gray)">Sin cambios registrados</div>':hist.map(h=>`<div style="font-size:11px;color:var(--text-gray)"><strong>${h.status}</strong> • ${new Date(h.date).toLocaleDateString('es-CL')}</div>`).join('');renderInteractionsTimeline();populateNextActionFields();document.getElementById('client-modal').classList.add('active');switchClientTab('info')}
+function openNewClientModal(stageId='Prospecto'){currentEditingId=null;document.getElementById('client-modal-title').textContent='Nuevo Cliente';document.getElementById('stage-bar').innerHTML='';document.getElementById('modal-name').value='';document.getElementById('modal-country').value='Chile';document.getElementById('modal-region').value='';document.getElementById('modal-email').value='';document.getElementById('modal-phone').value='';document.getElementById('modal-type').value='B2C';document.getElementById('modal-field').value='';document.getElementById('modal-hectares').value='';document.getElementById('modal-price').value='';document.getElementById('modal-arr').value='';document.getElementById('modal-mrr').value='';document.getElementById('modal-start-date').value='';document.getElementById('modal-notes').value='';modalImpResp='cliente';selectClientImpResp('cliente');document.getElementById('modal-imp-otro-name').value='';const statusButtons=document.getElementById('status-buttons');const CURRENT_STAGES_SB=currentPlatform==='baumapp'?STAGES:BS_STAGES;statusButtons.innerHTML=CURRENT_STAGES_SB.map(s=>`<button class="btn ${stageId===s.id?'active':''}" style="background:${stageId===s.id?s.color:'#f0f0f0'};color:${stageId===s.id?'white':'var(--text-gray)'}" onclick="setModalStatus('${s.id}')">${s.label}</button>`).join('');document.getElementById('status-history').innerHTML='<div style="font-size:12px;color:var(--text-gray)">Nuevo cliente</div>';renderInteractionsTimeline();populateNextActionFields();document.getElementById('client-modal').classList.add('active');switchClientTab('info')}
+function closeEditModal(){document.getElementById('client-modal').classList.remove('active')}
+function switchClientTab(tab){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.modal-tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+tab).classList.add('active');event.target.classList.add('active');if(tab==='actividad'){renderInteractionsTimeline();}if(tab==='seguimiento'){populateNextActionFields();}}
+let modalImpResp='cliente';
+function selectClientImpResp(r){modalImpResp=r;['cliente','baum','otro'].forEach(k=>{const btn=document.getElementById('modal-imp-'+k);if(btn){btn.classList.remove('selected');if((k==='cliente'&&r==='cliente')||(k==='baum'&&r==='baumsystem')||(k==='otro'&&r==='otro'))btn.classList.add('selected')}});document.getElementById('modal-imp-otro-wrap').style.display=r==='otro'?'block':'none'}
+let modalStatus='Prospecto';function setModalStatus(s){modalStatus=s;const btns=document.getElementById('status-buttons').querySelectorAll('.btn');(currentPlatform==='baumapp'?STAGES:BS_STAGES).forEach((stage,i)=>{if(stage.id===s){btns[i].style.background=stage.color;btns[i].style.color='white'}else{btns[i].style.background='#f0f0f0';btns[i].style.color='var(--text-gray)'}})}
+function saveClientModal(){const name=document.getElementById('modal-name').value.trim();if(!name){alert('El nombre es obligatorio');return}if(currentEditingId){const c=clients.find(cl=>cl.id===currentEditingId);c.name=name;c.country=document.getElementById('modal-country').value;c.region=document.getElementById('modal-region').value;c.email=document.getElementById('modal-email').value;c.phone=document.getElementById('modal-phone').value;c.type=document.getElementById('modal-type').value;c.field=document.getElementById('modal-field').value;c.hectares=parseFloat(document.getElementById('modal-hectares').value)||0;c.pricePerHaYear=parseFloat(document.getElementById('modal-price').value)||0;c.arr=parseFloat(document.getElementById('modal-arr').value)||0;c.mrr=parseFloat(document.getElementById('modal-mrr').value)||0;c.startDate=document.getElementById('modal-start-date').value;c.notes=document.getElementById('modal-notes').value;c.impResp=modalImpResp;c.impRespName=modalImpResp==='otro'?(document.getElementById('modal-imp-otro-name').value||''):'';c.status=modalStatus}else{const newClient={id:nextId++,name:name,country:document.getElementById('modal-country').value,region:document.getElementById('modal-region').value,email:document.getElementById('modal-email').value,phone:document.getElementById('modal-phone').value,type:document.getElementById('modal-type').value,field:document.getElementById('modal-field').value,hectares:parseFloat(document.getElementById('modal-hectares').value)||0,pricePerHaYear:parseFloat(document.getElementById('modal-price').value)||0,arr:parseFloat(document.getElementById('modal-arr').value)||0,mrr:parseFloat(document.getElementById('modal-mrr').value)||0,status:modalStatus,startDate:document.getElementById('modal-start-date').value||null,notes:document.getElementById('modal-notes').value,impResp:modalImpResp,impRespName:modalImpResp==='otro'?(document.getElementById('modal-imp-otro-name').value||''):'',progress:10};clients.push(newClient)}persist();closeEditModal();renderPipeline();renderClients();renderDashboard()}
+function deleteClient(){if(!currentEditingId||!confirm('Eliminar este cliente?'))return;clients=clients.filter(c=>c.id!==currentEditingId);persist();closeEditModal();renderClients();renderPipeline()}
+function markAsLost(){document.getElementById('loss-modal').classList.add('active')}
+function closeLossModal(){document.getElementById('loss-modal').classList.remove('active');document.getElementById('selected-loss-reason').value='';selectedLossReason=''}
+function selectLossReason(reason){selectedLossReason=reason;document.querySelectorAll('.reason-btn').forEach(b=>b.classList.remove('selected'));event.target.classList.add('selected');document.getElementById('selected-loss-reason').value=reason}
+function confirmLoss(){if(!selectedLossReason){alert('Selecciona una razón');return}const c=clients.find(cl=>cl.id===currentEditingId);if(c){c.status='Perdido';c.lossReason=selectedLossReason;c.lossNotes=document.getElementById('loss-notes').value;c.lossDate=new Date().toISOString();recordStatusChange(currentEditingId,'Perdido');persist();closeEditModal();closeLossModal();renderPipeline();renderClients();renderDashboard()}}
+function renderTarifario(){renderTCTable()}
+function selectTCCompany(co){tcCompany=co;const btnBA=document.getElementById('tc-btn-ba'),btnBS=document.getElementById('tc-btn-bs');if(co==='baumapp'){btnBA.style.background='var(--success)';btnBS.style.background='#f0f7ff'}else{btnBS.style.background='var(--primary)';btnBA.style.background='#f0f7ff'}renderTCTable();calcTariff()}
+let editingTariffIdx=-1;
+function renderTCTable(){
+  const el=document.getElementById('tc-table');
+  if(tcCompany==='baumapp'){
+    let rows=BA_TARIFF.map((t,i)=>{
+      if(editingTariffIdx===i){
+        return `<tr style="background:#fffbe6"><td colspan="2" style="padding:6px"><div style="display:flex;flex-direction:column;gap:6px"><div style="display:flex;gap:4px"><input type="number" id="te-from-${i}" value="${t.from}" style="width:60px;padding:3px 5px;border:1px solid var(--border);border-radius:4px;font-size:11px" placeholder="Desde"><span style="line-height:28px">–</span><input type="number" id="te-to-${i}" value="${t.to===999999?'':t.to}" style="width:60px;padding:3px 5px;border:1px solid var(--border);border-radius:4px;font-size:11px" placeholder="Hasta"><input type="number" id="te-price-${i}" value="${t.price}" step="0.1" style="width:60px;padding:3px 5px;border:1px solid var(--border);border-radius:4px;font-size:11px" placeholder="USD"></div><div style="display:flex;gap:4px"><input id="te-label-${i}" value="${t.label}" style="flex:1;padding:3px 5px;border:1px solid var(--border);border-radius:4px;font-size:11px" placeholder="Etiqueta"><button onclick="saveTariffRow(${i})" style="padding:3px 8px;background:var(--success);color:white;border:none;border-radius:4px;font-size:11px;cursor:pointer">✓</button><button onclick="cancelTariffEdit()" style="padding:3px 8px;background:#eee;border:none;border-radius:4px;font-size:11px;cursor:pointer">✕</button><button onclick="deleteTariffRow(${i})" style="padding:3px 8px;background:var(--lost);color:white;border:none;border-radius:4px;font-size:11px;cursor:pointer">🗑</button></div></div></td></tr>`;
+      }
+      return `<tr style="border-bottom:1px solid #f0f0f0"><td style="padding:5px 8px">${t.from}–${t.to===999999?'∞':t.to} ha</td><td style="padding:5px 8px;text-align:right;font-weight:700;color:var(--success)">$${t.price} USD <span onclick="editTariffRow(${i})" style="cursor:pointer;font-weight:400;opacity:.5;margin-left:4px" title="Editar">✏️</span></td></tr>`;
+    }).join('');
+    el.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><div class="form-label">Tabla BaumApp</div><div style="display:flex;gap:8px"><span onclick="addTariffRow()" style="font-size:11px;color:var(--success);cursor:pointer;font-weight:600">+ Agregar</span><span onclick="resetTariffs()" style="font-size:11px;color:var(--text-gray);cursor:pointer">↺ Restaurar</span></div></div><table style="width:100%;font-size:12px;border-collapse:collapse;margin-top:8px"><thead><tr style="background:#d1f0e5"><th style="padding:6px 8px;text-align:left;font-weight:700;color:var(--success)">Rango ha</th><th style="padding:6px 8px;text-align:right;font-weight:700;color:var(--success)">$/ha/año</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }else{
+    let rows=BS_TARIFF.map((t,i)=>{
+      if(editingTariffIdx===i){
+        return `<tr style="background:#fffbe6"><td colspan="2" style="padding:6px"><div style="display:flex;flex-direction:column;gap:6px"><div style="display:flex;gap:4px"><input type="number" id="te-from-${i}" value="${t.from}" style="width:50px;padding:3px 5px;border:1px solid var(--border);border-radius:4px;font-size:11px" placeholder="Desde"><span style="line-height:28px">–</span><input type="number" id="te-to-${i}" value="${t.to}" style="width:50px;padding:3px 5px;border:1px solid var(--border);border-radius:4px;font-size:11px" placeholder="Hasta"><input type="number" id="te-priceCLP-${i}" value="${t.priceCLP}" style="width:70px;padding:3px 5px;border:1px solid var(--border);border-radius:4px;font-size:11px" placeholder="CLP"></div><div style="display:flex;gap:4px"><input type="number" id="te-visits-${i}" value="${t.visits}" style="width:40px;padding:3px 5px;border:1px solid var(--border);border-radius:4px;font-size:11px" placeholder="Vis"><input id="te-cat-${i}" value="${t.cat}" style="width:30px;padding:3px 5px;border:1px solid var(--border);border-radius:4px;font-size:11px" placeholder="Cat"><button onclick="saveTariffRow(${i})" style="padding:3px 8px;background:var(--primary);color:white;border:none;border-radius:4px;font-size:11px;cursor:pointer">✓</button><button onclick="cancelTariffEdit()" style="padding:3px 8px;background:#eee;border:none;border-radius:4px;font-size:11px;cursor:pointer">✕</button><button onclick="deleteTariffRow(${i})" style="padding:3px 8px;background:var(--lost);color:white;border:none;border-radius:4px;font-size:11px;cursor:pointer">🗑</button></div></div></td></tr>`;
+      }
+      return `<tr style="border-bottom:1px solid #f0f0f0"><td style="padding:5px 8px">${t.from}–${t.to} ha</td><td style="padding:5px 8px;text-align:right;font-weight:700;color:var(--primary)">$${t.priceCLP.toLocaleString('es-CL')} <span onclick="editTariffRow(${i})" style="cursor:pointer;font-weight:400;opacity:.5;margin-left:4px" title="Editar">✏️</span></td></tr>`;
+    }).join('');
+    el.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><div class="form-label">Tabla BaumSystem</div><div style="display:flex;gap:8px"><span onclick="addTariffRow()" style="font-size:11px;color:var(--primary);cursor:pointer;font-weight:600">+ Agregar</span><span onclick="resetTariffs()" style="font-size:11px;color:var(--text-gray);cursor:pointer">↺ Restaurar</span></div></div><table style="width:100%;font-size:12px;border-collapse:collapse;margin-top:8px"><thead><tr style="background:#d7e3ff"><th style="padding:6px 8px;text-align:left;font-weight:700;color:var(--primary)">Rango ha</th><th style="padding:6px 8px;text-align:right;font-weight:700;color:var(--primary)">Precio CLP</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+}
+function editTariffRow(i){editingTariffIdx=i;renderTCTable()}
+function cancelTariffEdit(){editingTariffIdx=-1;renderTCTable()}
+function saveTariffRow(i){
+  if(tcCompany==='baumapp'){
+    const from=parseInt(document.getElementById('te-from-'+i).value)||0;
+    const to=parseInt(document.getElementById('te-to-'+i).value)||999999;
+    const price=parseFloat(document.getElementById('te-price-'+i).value)||0;
+    const label=document.getElementById('te-label-'+i).value||'';
+    BA_TARIFF[i]={from,to:to||999999,price,label};
+  }else{
+    const from=parseInt(document.getElementById('te-from-'+i).value)||0;
+    const to=parseInt(document.getElementById('te-to-'+i).value)||0;
+    const priceCLP=parseInt(document.getElementById('te-priceCLP-'+i).value)||0;
+    const visits=parseInt(document.getElementById('te-visits-'+i).value)||0;
+    const cat=document.getElementById('te-cat-'+i).value||'';
+    BS_TARIFF[i]={from,to,priceCLP,visits,cat};
+  }
+  editingTariffIdx=-1;saveTariffs();renderTCTable();calcTariff();
+}
+function deleteTariffRow(i){
+  if(!confirm('¿Eliminar esta fila de tarifa?'))return;
+  if(tcCompany==='baumapp'){BA_TARIFF.splice(i,1)}else{BS_TARIFF.splice(i,1)}
+  editingTariffIdx=-1;saveTariffs();renderTCTable();calcTariff();
+}
+function addTariffRow(){
+  if(tcCompany==='baumapp'){
+    const last=BA_TARIFF[BA_TARIFF.length-1];
+    BA_TARIFF.push({from:(last?last.to+1:1),to:999999,price:0,label:'Nueva'});
+    editingTariffIdx=BA_TARIFF.length-1;
+  }else{
+    const last=BS_TARIFF[BS_TARIFF.length-1];
+    BS_TARIFF.push({from:(last?last.to+1:1),to:(last?last.to+50:100),priceCLP:0,visits:0,cat:''});
+    editingTariffIdx=BS_TARIFF.length-1;
+  }
+  saveTariffs();renderTCTable();
+}
+function calcTariff(){const ha=parseFloat(document.getElementById('tc-ha')?.value||0),el=document.getElementById('tc-result');if(!ha||ha<=0){el.innerHTML='<div style="color:var(--text-gray);font-size:13px;text-align:center">Ingresa las hectáreas para calcular →</div>';return}if(tcCompany==='baumapp'){const tier=BA_TARIFF.find(t=>ha>=t.from&&ha<=t.to)||BA_TARIFF[BA_TARIFF.length-1],annual=ha*tier.price,monthly=annual/12;el.style.alignItems='flex-start';el.style.justifyContent='flex-start';el.style.background='white';el.style.borderColor='var(--success)';el.innerHTML=`<div><div style="font-size:12px;color:var(--text-gray);margin-bottom:8px">Tarifa: <strong>$${tier.price} USD/ha/año</strong> (${tier.label})</div><div style="font-size:24px;font-weight:800;color:var(--success);margin-bottom:4px">$${annual.toLocaleString('en-US',{maximumFractionDigits:0})}</div><div style="font-size:12px;color:var(--text-gray)">Anual • ${monthly.toLocaleString('en-US',{maximumFractionDigits:0})} USD/mes</div></div>`}else{const tier=BS_TARIFF.find(t=>ha>=t.from&&ha<=t.to)||BS_TARIFF[BS_TARIFF.length-1];el.style.alignItems='flex-start';el.style.justifyContent='flex-start';el.style.background='white';el.style.borderColor='var(--primary)';el.innerHTML=`<div><div style="font-size:12px;color:var(--text-gray);margin-bottom:8px">Categoría: <strong>${tier.cat}</strong> (${tier.visits} visitas)</div><div style="font-size:24px;font-weight:800;color:var(--primary);margin-bottom:4px">$${tier.priceCLP.toLocaleString('es-CL')}</div><div style="font-size:12px;color:var(--text-gray)">Anual (precio fijo)</div></div>`}}
+function syncImpHa(){const ha=document.getElementById('tc-ha')?.value,impHa=document.getElementById('imp-ha');if(impHa&&ha){impHa.value=ha;calcImplementation()}}
+function selectImpResp(r){impResp=r;const F='flex:1;padding:7px 10px;border:none;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;transition:.2s;font-family:inherit;';document.getElementById('imp-btn-cliente').style.cssText=F+(r==='cliente'?'background:var(--success);color:white;':'background:#f0f0f0;color:var(--text-gray);');document.getElementById('imp-btn-baum').style.cssText=F+(r==='baumsystem'?'background:var(--primary);color:white;':'background:#f0f0f0;color:var(--text-gray);');document.getElementById('imp-btn-otro').style.cssText=F+(r==='otro'?'background:var(--warning);color:white;':'background:#f0f0f0;color:var(--text-gray);');document.getElementById('imp-otro-wrap').style.display=r==='otro'?'block':'none';calcImplementation()}
+function selectImpType(t){impType=t;const F='flex:1;padding:7px 10px;border:none;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;transition:.2s;font-family:inherit;';document.getElementById('imp-btn-ha').style.cssText=F+(t==='por_ha'?'background:var(--primary);color:white;':'background:#f0f0f0;color:var(--text-gray);');document.getElementById('imp-btn-fijo').style.cssText=F+(t==='fijo'?'background:var(--primary);color:white;':'background:#f0f0f0;color:var(--text-gray);');document.getElementById('imp-label-price').textContent=t==='por_ha'?'Precio levantamiento (USD/ha)':'Monto fijo total (USD)';document.getElementById('imp-price').placeholder=t==='por_ha'?'Ej: 5':'Ej: 1500';calcImplementation()}
+function getImpRespLabel(){if(impResp==='cliente')return'El cliente';if(impResp==='baumsystem')return'BaumSystem';const otro=document.getElementById('imp-otro-name')?.value?.trim();return otro||'Tercero'}
+function calcImplementation(){const ha=parseFloat(document.getElementById('imp-ha')?.value||0),price=parseFloat(document.getElementById('imp-price')?.value||0),el=document.getElementById('imp-result');if(!ha||ha<=0||!price||price<=0){el.innerHTML='<div style="color:var(--text-gray);font-size:13px;text-align:center">Completa los campos para ver la cotización →</div>';return}const impTotal=impType==='por_ha'?ha*price:price,tier=BA_TARIFF.find(t=>ha>=t.from&&ha<=t.to)||BA_TARIFF[BA_TARIFF.length-1],arrAnual=ha*tier.price,totalYear1=impTotal+arrAnual;const respLabel=getImpRespLabel();const respColor=impResp==='cliente'?'var(--success)':impResp==='baumsystem'?'var(--primary)':'var(--warning)';el.style.alignItems='flex-start';el.style.justifyContent='flex-start';el.style.background='white';el.style.borderColor=respColor;el.innerHTML=`<div><div style="display:inline-block;padding:3px 10px;border-radius:5px;font-size:11px;font-weight:700;margin-bottom:10px;background:${respColor};color:white">Levantamiento: ${respLabel}</div><div style="font-size:12px;color:var(--text-gray);margin-bottom:6px">${impType==='por_ha'?`${ha.toLocaleString('es-CL')} ha × $${price}/ha`:'Monto fijo'}</div><div style="font-size:18px;font-weight:700;color:${respColor}">${fmt(impTotal)}</div><div style="font-size:11px;color:var(--text-gray);margin-bottom:12px">+ ARR anual: ${fmt(arrAnual)}</div><div style="border-top:1px solid var(--border);padding-top:8px"><div style="font-size:11px;color:var(--text-gray);margin-bottom:2px">Total primer año:</div><div style="font-size:20px;font-weight:800;color:${respColor}">${fmt(totalYear1)}</div></div></div>`}
+function renderReuniones(){
+  const select=document.getElementById('mtg-client');
+  if(select) select.innerHTML='<option value="">Seleccionar cliente...</option>'+clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+
+  const list=document.getElementById('global-meetings-list');
+  if(list) list.innerHTML=globalMtgs.length===0
+    ? '<div style="font-size:12px;color:var(--text-gray);padding:12px">Sin reuniones registradas</div>'
+    : globalMtgs.map((m,i) => {
+      const timeStr = m.time ? ' · ' + m.time : '';
+      const durStr = m.duration ? ' (' + m.duration + ' min)' : '';
+      const locStr = m.location ? ' · ' + ICO.pin + ' ' + m.location : '';
+      let calBtn = '';
+      if (m.date && m.time) {
+        const startDT = m.date.replace(/-/g,'') + 'T' + m.time.replace(':','') + '00';
+        const endDate = new Date(m.date + 'T' + m.time + ':00');
+        endDate.setMinutes(endDate.getMinutes() + (m.duration||60));
+        const endDT = endDate.toISOString().replace(/[-:]/g,'').split('.')[0];
+        const title = encodeURIComponent('Reunión: ' + m.clientName + ' - ' + m.note);
+        const details = encodeURIComponent('Cliente: ' + m.clientName + '\nDescripción: ' + m.note);
+        const loc = encodeURIComponent(m.location || '');
+        const calUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + title + '&dates=' + startDT + '/' + endDT + '&details=' + details + '&location=' + loc;
+        calBtn = '<a href="' + calUrl + '" target="_blank" class="btn btn-secondary" style="padding:4px 8px;font-size:11px;text-decoration:none">' + ICO.calSmall + '</a>';
+      }
+      return '<div style="display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid var(--border)"><div style="font-size:11px;color:var(--text-gray);min-width:80px;font-weight:600">' + m.date + '</div><div style="flex:1"><span style="font-weight:700;color:var(--text-dark)">' + m.clientName + ':</span> <span style="color:var(--text-gray)">' + m.note + '</span>' + (m.time ? '<span style="font-size:10px;color:var(--text-gray)">' + timeStr + durStr + locStr + '</span>' : '') + '</div><div style="display:flex;gap:4px">' + calBtn + '<button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="deleteGlobalMeeting(' + i + ')">✕</button></div></div>';
+    }).join('');
+
+  const actionsList=document.getElementById('actions-list');
+  if(actionsList) actionsList.innerHTML=actions.length===0
+    ? '<div style="font-size:12px;color:var(--text-gray)">Sin acciones pendientes</div>'
+    : actions.map((a,i)=>`<div style="padding:10px;background:#f9fafc;border-radius:6px;display:flex;justify-content:space-between;align-items:center"><div style="flex:1"><div style="font-weight:600;font-size:13px;color:var(--text-dark)">${a.title}</div><div style="font-size:11px;color:var(--text-gray)">${a.dueDate||'Sin fecha'} · ${a.client||'General'}</div></div><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="deleteAction(${i})">✓</button></div>`).join('');
+
+  // Render pending actions panel (from client nextAction)
+  const pendingPanel=document.getElementById('pending-actions-panel');
+  if(pendingPanel){
+    const today=new Date().toISOString().split('T')[0];
+    const pending=[];
+    clients.forEach(client=>{if(client.nextAction&&client.nextAction.text){pending.push({name:client.name,id:client.id,text:client.nextAction.text,date:client.nextAction.date||''})}});
+    pending.sort((a,b)=>(a.date||'z').localeCompare(b.date||'z'));
+    pendingPanel.innerHTML=pending.length===0?'<div style="font-size:12px;color:var(--text-gray);padding:12px">Sin acciones pendientes</div>':pending.map(p=>{
+      const color=!p.date?'var(--text-gray)':p.date<today?'var(--lost)':p.date===today?'var(--warning)':'var(--text-gray)';
+      return '<div style="padding:10px;border-bottom:1px solid var(--border);cursor:pointer" onclick="openEditModal('+p.id+')"><div style="font-weight:600;font-size:12px;color:var(--text-dark)">'+p.name+'</div><div style="font-size:11px;color:'+color+'">'+p.text+(p.date?' · '+p.date:'')+'</div></div>';
+    }).join('');
+  }
+
+  // Render client activity list
+  const actList=document.getElementById('client-activity-list');
+  if(actList){
+    actList.innerHTML=clients.filter(c=>c.status!=='Perdido').map(c=>{
+      const mtgCount=globalMtgs.filter(m=>m.clientId===c.id).length;
+      const clientInts=interactions[c.id]||[];
+      const lastDate=clientInts.length>0?clientInts[clientInts.length-1].date:'—';
+      return '<div style="display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid var(--border);cursor:pointer" onclick="openEditModal('+c.id+')"><span class="status-badge '+statusBadgeClass(c.status)+'" style="min-width:60px;text-align:center;font-size:10px">'+c.status+'</span><div style="flex:1;font-weight:600;font-size:13px;color:var(--text-dark)">'+c.name+'</div><div style="font-size:11px;color:var(--text-gray);text-align:right">'+mtgCount+' reunión'+(mtgCount!==1?'es':'')+'</div><div style="font-size:11px;color:var(--text-gray);min-width:80px;text-align:right">Último: '+lastDate+'</div></div>';
+    }).join('');
+  }
+}
+function addGlobalMeeting(){
+  const clientId=parseInt(document.getElementById('mtg-client').value);
+  const date=document.getElementById('mtg-date').value;
+  const time=document.getElementById('mtg-time').value||'10:00';
+  const duration=parseInt(document.getElementById('mtg-duration').value)||60;
+  const note=document.getElementById('mtg-note').value;
+  const location=document.getElementById('mtg-location').value;
+  
+  if(!clientId||!date||!note.trim()){alert('Completa cliente, fecha y descripción');return}
+  
+  const c=clients.find(cl=>cl.id===clientId);
+  const clientName = c ? c.name : 'Cliente';
+  
+  // Save meeting
+  const meeting = {clientId, clientName:clientName, date, time, duration, note, location, createdBy: sessionStorage.getItem('baum_user_name')||sessionStorage.getItem('baum_user')||'Sistema'};
+  globalMtgs.unshift(meeting); // Add at beginning (newest first)
+  persist();
+  
+  // Generate Google Calendar link
+  const startDT = date.replace(/-/g,'') + 'T' + time.replace(':','') + '00';
+  const endDate = new Date(date + 'T' + time + ':00');
+  endDate.setMinutes(endDate.getMinutes() + duration);
+  const endDT = endDate.toISOString().replace(/[-:]/g,'').split('.')[0];
+  const title = encodeURIComponent('Reunión: ' + clientName + ' - ' + note);
+  const details = encodeURIComponent('Cliente: ' + clientName + '\nDescripción: ' + note + '\nCreada por: ' + (sessionStorage.getItem('baum_user_name')||'Sistema') + '\n\nRegistrada desde BaumApp CRM');
+  const loc = encodeURIComponent(location || '');
+  
+  const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startDT}/${endDT}&details=${details}&location=${loc}`;
+  
+  // Open Google Calendar in new tab
+  window.open(calUrl, '_blank');
+  
+  // Reset form
+  document.getElementById('mtg-date').value='';
+  document.getElementById('mtg-time').value='10:00';
+  document.getElementById('mtg-note').value='';
+  document.getElementById('mtg-location').value='';
+  renderReuniones();
+}
+function deleteGlobalMeeting(i){globalMtgs.splice(i,1);persist();renderReuniones()}
+function addAction(){
+  const client=document.getElementById('action-client').value.trim();
+  const date=document.getElementById('action-date').value;
+  const text=document.getElementById('action-text').value.trim();
+  if(!text){alert('Ingresa una acción');return}
+  actions.push({title:text,client:client||'General',dueDate:date||''});
+  persist();
+  document.getElementById('action-client').value='';
+  document.getElementById('action-date').value='';
+  document.getElementById('action-text').value='';
+  renderReuniones();
+}
+function deleteAction(i){actions.splice(i,1);persist();renderReuniones()}
+let bsHistCI=null,bsChCI=null;function renderBaumSystem(){const bs=clients.find(c=>c.name==='BaumSystem'),card=document.getElementById('bs-client-card');if(bs&&card){card.innerHTML=`<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap"><div style="width:52px;height:52px;border-radius:14px;background:var(--success);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:24px">${ICO.leaf}</div><div style="flex:1"><div style="font-size:18px;font-weight:800;color:var(--success)">${bs.name}</div><div style="font-size:12px;color:var(--text-gray);margin-top:2px">${bs.country} · ${bs.type}</div></div><div style="display:flex;gap:12px;flex-wrap:wrap"><div style="text-align:center;padding:10px 16px;background:#d1f0e5;border-radius:10px"><div style="font-size:20px;font-weight:800;color:var(--success)">${bs.hectares.toLocaleString('es-CL',{maximumFractionDigits:1})}</div><div style="font-size:10px;color:var(--text-gray)">Ha en BaumApp</div></div><div style="text-align:center;padding:10px 16px;background:white;border-radius:10px;border:1px solid var(--success)"><div style="font-size:20px;font-weight:800;color:var(--success)">${fmt(bs.arr)}</div><div style="font-size:10px;color:var(--text-gray)">ARR anual</div></div></div></div>`}if(bsHistCI)bsHistCI.destroy();bsHistCI=new Chart(document.getElementById('bs-history-chart'),{type:'line',data:{labels:BS_HA.map(d=>d.p),datasets:[{label:'Ha BaumSystem',data:BS_HA.map(d=>d.ha),borderColor:'#00c875',backgroundColor:'rgba(0,200,117,.08)',borderWidth:2,fill:true,tension:.3,pointRadius:3,pointBackgroundColor:'#00c875'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});if(bsChCI)bsChCI.destroy();const colors=BS_HA.map((d,i,a)=>i>0&&d.ha<a[i-1].ha?'rgba(230,57,70,.75)':'rgba(0,200,117,.65)');bsChCI=new Chart(document.getElementById('bs-churn-chart'),{type:'bar',data:{labels:BS_HA.map(d=>d.p),datasets:[{label:'Ha BaumSystem',data:BS_HA.map(d=>d.ha),backgroundColor:colors,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}})}
+let arrCI=null,mrrCI=null;function renderAnalisis(){if(arrCI)arrCI.destroy();arrCI=new Chart(document.getElementById('arr-chart'),{type:'line',data:{labels:BASE_ARR.map(d=>d.m),datasets:[{label:'ARR BaumApp',data:BASE_ARR.map(d=>d.arr),borderColor:'#0073ea',backgroundColor:'rgba(0,115,234,.08)',borderWidth:2,fill:true,tension:.3,pointRadius:4,pointBackgroundColor:'#0073ea'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});if(mrrCI)mrrCI.destroy();mrrCI=new Chart(document.getElementById('mrr-chart'),{type:'bar',data:{labels:BASE_ARR.map(d=>d.m),datasets:[{label:'MRR BaumApp',data:BASE_ARR.map(d=>d.mrr),backgroundColor:'#00c875',borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});renderWeeklyLog()}
+function addWeeklyLog(){const date=document.getElementById('weekly-date').value,arr=parseFloat(document.getElementById('weekly-arr').value),mrr=parseFloat(document.getElementById('weekly-mrr').value),note=document.getElementById('weekly-note').value;if(!date||!arr||!mrr){alert('Completa fecha, ARR y MRR');return}weeklyLog.push({date,arr,mrr,note});persist();document.getElementById('weekly-date').value='';document.getElementById('weekly-arr').value='';document.getElementById('weekly-mrr').value='';document.getElementById('weekly-note').value='';renderWeeklyLog()}
+function renderWeeklyLog(){document.getElementById('weekly-log-list').innerHTML=weeklyLog.length===0?'<div class="empty-state" style="padding:20px">Sin registros. Usa "+ Registrar" para agregar el seguimiento semanal.</div>':weeklyLog.map((w,i)=>`<div style="padding:10px;background:#f9fafc;border-radius:6px;display:flex;justify-content:space-between;align-items:center"><div><strong>${w.date}</strong> — MRR: ${fmt(w.mrr)} · ARR: ${fmt(w.arr)}${w.note?' · '+w.note:''}</div><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="deleteWeeklyLog(${i})">✕</button></div>`).join('')}
+function deleteWeeklyLog(i){weeklyLog.splice(i,1);persist();renderWeeklyLog()}
+function generatePassword(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';let p='';for(let i=0;i<8;i++)p+=chars[Math.floor(Math.random()*chars.length)];return p}
+let editingUserEmail=null;
+function renderUsersView(){
+  appUsers=loadAppUsers();
+  const currentEmail=sessionStorage.getItem('baum_user')||'';
+  const list=document.getElementById('user-list');
+  if(!list)return;
+  const entries=Object.keys(appUsers);
+  if(!entries.length){list.innerHTML='<div style="font-size:12px;color:var(--text-gray)">Sin usuarios</div>';return}
+  list.innerHTML=entries.map(email=>{
+    const ud=appUsers[email];
+    const name=(typeof ud==='object'?ud.name:email.split('@')[0]);
+    const isCurrent=(email===currentEmail);
+    let editBlock='';
+    if(editingUserEmail===email){
+      editBlock='<div style="margin-top:8px;display:flex;gap:6px;align-items:center"><input id="edit-pass-'+email.replace(/[@.]/g,'_')+'" type="text" class="form-input" placeholder="Nueva contraseña" style="font-size:11px;padding:6px 8px;flex:1"><button class="btn" style="padding:4px 10px;font-size:11px" onclick="saveUserPassword(&quot;'+email+'&quot;)">Guardar</button><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="cancelEditUser()">Cancelar</button></div>';
+    }
+    let actions='<div style="display:flex;gap:4px">';
+    actions+='<button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="editUserPassword(&quot;'+email+'&quot;)">Cambiar clave</button>';
+    if(!isCurrent)actions+='<button class="btn btn-secondary" style="padding:4px 8px;font-size:11px;color:var(--lost);border-color:var(--lost)" onclick="deleteUser(&quot;'+email+'&quot;)">Eliminar</button>';
+    actions+='</div>';
+    return '<div style="padding:10px;background:#f9fafc;border-radius:6px"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:600;font-size:13px;color:var(--text-dark)">'+name+'</div><div style="font-size:11px;color:var(--text-gray)">'+email+(isCurrent?' · <span style="color:var(--success);font-weight:600">Sesión activa</span>':'')+'</div></div>'+actions+'</div>'+editBlock+'</div>';
+  }).join('')
+}
+function editUserPassword(email){editingUserEmail=email;renderUsersView()}
+function cancelEditUser(){editingUserEmail=null;renderUsersView()}
+function saveUserPassword(email){
+  const inputId='edit-pass-'+email.replace(/[@.]/g,'_');
+  const newPass=document.getElementById(inputId).value;
+  if(!newPass||newPass.length<4){alert('La contraseña debe tener al menos 4 caracteres');return}
+  appUsers=loadAppUsers();
+  if(appUsers[email]){appUsers[email].password=newPass;saveAppUsers(appUsers)}
+  editingUserEmail=null;
+  alert('Contraseña actualizada');
+  renderUsersView()
+}
+function addNewUser(){
+  const name=document.getElementById('new-user-name').value.trim();
+  const email=document.getElementById('new-user-email').value.trim().toLowerCase();
+  if(!name||!email){alert('Ingresa nombre y correo electrónico');return}
+  if(!email.includes('@')){alert('Ingresa un correo válido');return}
+  appUsers=loadAppUsers();
+  if(appUsers[email]){alert('Ya existe un usuario con este correo');return}
+  const pass=generatePassword();
+  appUsers[email]={password:pass,name:name};
+  saveAppUsers(appUsers);
+  const display=document.getElementById('new-user-pass-display');
+  display.style.display='block';
+  display.innerHTML='<strong>Usuario creado:</strong> '+name+'<br><strong>Correo:</strong> '+email+'<br><strong>Contraseña temporal:</strong> <span style="font-family:monospace;background:#e8f5e9;padding:2px 6px;border-radius:4px;font-weight:700">'+pass+'</span><br><span style="font-size:10px;color:var(--text-gray)">Comparta esta contraseña. El usuario puede cambiarla desde Usuarios.</span>';
+  document.getElementById('new-user-name').value='';
+  document.getElementById('new-user-email').value='';
+  renderUsersView()
+}
+function deleteUser(email){if(!confirm('¿Eliminar usuario "'+email+'"?'))return;appUsers=loadAppUsers();delete appUsers[email];saveAppUsers(appUsers);renderUsersView()}
+function downloadCSV(csv,filename){const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename+'_'+new Date().toISOString().split('T')[0]+'.csv';a.click();URL.revokeObjectURL(url)}
+function exportContextual(){
+  const d=new Date().toISOString().split('T')[0];
+  if(currentView==='clientes'||currentView==='pipeline'){
+    let csv='Nombre,País,Ha,Precio/Ha/Año,ARR USD,MRR USD,Tipo,Estado,Email,Teléfono,Notas\n';
+    clients.forEach(c=>{csv+=`"${c.name}","${c.country}","${c.hectares}","${c.pricePerHaYear}","${c.arr}","${c.mrr}","${c.type}","${c.status}","${c.email||''}","${c.phone||''}","${(c.notes||'').replace(/"/g,'""')}"\n`});
+    downloadCSV(csv,'clientes');
+  } else if(currentView==='tarifario'){
+    let csv='';
+    if(tcCompany==='baumapp'){
+      csv='Desde Ha,Hasta Ha,Precio USD/ha/año,Etiqueta\n';
+      BA_TARIFF.forEach(t=>{csv+=`"${t.from}","${t.to===999999?'∞':t.to}","${t.price}","${t.label}"\n`});
+    } else {
+      csv='Desde Ha,Hasta Ha,Precio CLP,Visitas,Categoría\n';
+      BS_TARIFF.forEach(t=>{csv+=`"${t.from}","${t.to}","${t.priceCLP}","${t.visits}","${t.cat}"\n`});
+    }
+    downloadCSV(csv,'tarifario_'+(tcCompany==='baumapp'?'baumapp':'baumsystem'));
+  } else if(currentView==='reuniones'){
+    let csv='Cliente,Fecha,Hora,Duración (min),Ubicación,Descripción,Creado por\n';
+    globalMtgs.forEach(m=>{csv+=`"${m.clientName}","${m.date}","${m.time||''}","${m.duration||''}","${m.location||''}","${(m.note||'').replace(/"/g,'""')}","${m.createdBy||''}"\n`});
+    downloadCSV(csv,'reuniones');
+  } else if(currentView==='dashboard'){
+    const actuals=calculateActuals();
+    let csv='Mes,Meta Ha Nuevas,Real Ha Nuevas,Meta MRR USD,Real MRR USD,Meta Clientes,Real Clientes\n';
+    MONTHLY_TARGETS_2026.forEach(t=>{csv+=`"${t.label}","${t.haNewTarget}","${fmtNum(actuals.newHa)}","${t.mrrTargetUSD}","${Math.round(actuals.totalMRR)}","${t.clientsTarget}","${actuals.newClientsClosed}"\n`});
+    downloadCSV(csv,'metas_vs_real');
+  } else if(currentView==='analisis'){
+    let csv='Mes,ARR,MRR\n';
+    BASE_ARR.forEach(d=>{csv+=`"${d.m}","${d.arr}","${d.mrr}"\n`});
+    if(weeklyLog.length>0){csv+='\nRegistro Semanal\nFecha,ARR,MRR,Nota\n';weeklyLog.forEach(w=>{csv+=`"${w.date}","${w.arr}","${w.mrr}","${(w.note||'').replace(/"/g,'""')}"\n`})}
+    downloadCSV(csv,'analisis');
+  } else if(currentView==='usuarios'){
+    let csv='Correo,Nombre\n';
+    const users=loadAppUsers();
+    Object.keys(users).forEach(email=>{csv+=`"${email}","${users[email].name||''}"\n`});
+    downloadCSV(csv,'usuarios');
+  } else {
+    let csv='Nombre,País,Ha,ARR USD,Estado\n';
+    clients.forEach(c=>{csv+=`"${c.name}","${c.country}","${c.hectares}","${c.arr}","${c.status}"\n`});
+    downloadCSV(csv,'datos');
+  }
+}
+function destroyChart(id){if(charts[id]){charts[id].destroy();delete charts[id]}}
+function injectIcons(){const map={'nav-ico-dash':ICO.dash,'nav-ico-pipe':ICO.pipeline,'nav-ico-cli':ICO.clients,'nav-ico-tar':ICO.tariff,'nav-ico-cal':ICO.calendar,'nav-ico-chart':ICO.chart,'nav-ico-usr':ICO.users,'ico-ba':ICO.app,'ico-bs':ICO.leaf,'ico-csv':ICO.csv,'ico-warn-dash':ICO.warn,'ico-warn-2':ICO.warn,'ico-agendar':ICO.calendar,'ico-int-phone':ICO.phone,'ico-int-email':ICO.email,'ico-int-meet':ICO.meet,'ico-int-note':ICO.note};Object.keys(map).forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=map[id]})}
+function init(){document.getElementById('fx-rate').value=fxRate;updateSidebarForPlatform();renderDashboard();injectIcons()}
+function render(){renderDashboard();renderPipeline();renderClients()}
+checkAuth();
+injectIcons();
+  
+function selectInteractionType(type){selectedInteractionType=type;document.querySelectorAll('#tab-actividad .reason-btn').forEach(b=>b.classList.remove('selected'));event.target.classList.add('selected');}
+function addInteraction(){const desc=document.getElementById('modal-interaction-desc').value;const date=document.getElementById('modal-interaction-date').value;if(!desc.trim()){alert('Ingresa una descripción');return;}if(!currentEditingId){alert('Error: cliente no seleccionado');return;}const user=sessionStorage.getItem('baum_user_name')||sessionStorage.getItem('baum_user')||'Sistema';const interaction={type:selectedInteractionType,date:date||new Date().toISOString().split('T')[0],description:desc,user:user};if(!interactions[currentEditingId]){interactions[currentEditingId]=[];}interactions[currentEditingId].push(interaction);document.getElementById('modal-interaction-desc').value='';document.getElementById('modal-interaction-date').value=new Date().toISOString().split('T')[0];renderInteractionsTimeline();persist();}
+function renderInteractionsTimeline(){if(!currentEditingId){return;}const list=interactions[currentEditingId]||[];const container=document.getElementById('interactions-timeline');container.innerHTML='';if(list.length===0){container.innerHTML='<div style="text-align:center;color:var(--text-gray);padding:20px">Sin interacciones registradas</div>';return;}const icons={llamada:ICO.phone,email:ICO.email,reunión:ICO.meet,nota:ICO.note};const sorted=[...list].reverse();sorted.forEach(int=>{const el=document.createElement('div');el.style.cssText='display:flex;gap:12px;padding:12px;background:#f9fafc;border-radius:8px;border-left:4px solid var(--primary)';el.innerHTML=`<div style="font-size:20px">${icons[int.type]||ICO.note}</div><div style="flex:1"><div style="font-weight:600;font-size:12px">${int.type}</div><div style="font-size:11px;color:var(--text-gray)">${int.description}</div><div style="font-size:10px;color:#999;margin-top:4px">${int.date} por ${int.user}</div></div>`;container.appendChild(el);});}
+function saveNextAction(){const text=document.getElementById('modal-next-action').value;const date=document.getElementById('modal-next-action-date').value;if(!text.trim()){alert('Ingresa una descripción');return;}if(!currentEditingId){alert('Error: cliente no seleccionado');return;}if(!clients.find(c=>c.id===currentEditingId)){alert('Cliente no encontrado');return;}const client=clients.find(c=>c.id===currentEditingId);client.nextAction={text:text,date:date};document.getElementById('modal-next-action').value='';document.getElementById('modal-next-action-date').value='';persist();alert('Próxima acción guardada');}
+function populateNextActionFields(){if(!currentEditingId){return;}const client=clients.find(c=>c.id===currentEditingId);if(client&&client.nextAction){document.getElementById('modal-next-action').value=client.nextAction.text||'';document.getElementById('modal-next-action-date').value=client.nextAction.date||'';}else{document.getElementById('modal-next-action').value='';document.getElementById('modal-next-action-date').value='';}}
+function getNextActionStatus(date){if(!date)return'gray';const today=new Date().toISOString().split('T')[0];if(date<today)return'red';if(date===today)return'orange';return'gray';}
+function getNextActionColor(status){if(status==='red')return'#e44258';if(status==='orange')return'#fdab3d';return'#999';}
+function renderDealCardNextAction(client){if(!client.nextAction||!client.nextAction.date)return'';const status=getNextActionStatus(client.nextAction.date);const color=getNextActionColor(status);const icon=status==='red'?ICO.dot_red:status==='orange'?ICO.dot_orange:ICO.dot_gray;return `<div style="font-size:10px;color:${color};margin-top:4px;display:flex;align-items:center;gap:4px"><span>${icon}</span><span>${client.nextAction.date}</span></div>`;}
+
+function renderPendingActions(){const container=document.getElementById('pending-actions-list');const today=new Date().toISOString().split('T')[0];const pending=[];clients.forEach(client=>{if(client.nextAction&&client.nextAction.date){pending.push({...client,actionDate:client.nextAction.date});}});pending.sort((a,b)=>a.actionDate.localeCompare(b.actionDate));container.innerHTML=pending.length===0?'<div style="text-align:center;color:var(--text-gray);padding:16px">Sin acciones pendientes</div>':'';pending.forEach(client=>{const status=getNextActionStatus(client.actionDate);const color=getNextActionColor(status);const icon=status==='red'?ICO.dot_red:status==='orange'?ICO.dot_orange:ICO.dot_gray;const el=document.createElement('div');el.style.cssText='padding:10px;background:#f9fafc;border-radius:6px;border-left:4px solid '+color+';cursor:pointer';el.innerHTML=`<div style="font-weight:600;font-size:12px">${client.name}</div><div style="font-size:11px;color:${color};margin-top:4px"><span>${icon}</span> ${client.nextAction.text} • ${client.actionDate}</div>`;el.onclick=()=>openEditModal(client.id);container.appendChild(el);});}
+function renderInactiveClients(){const container=document.getElementById('inactive-clients-list');const sevenDaysAgo=new Date();sevenDaysAgo.setDate(sevenDaysAgo.getDate()-7);const cutoffDate=sevenDaysAgo.toISOString().split('T')[0];const inactive=[];clients.forEach(client=>{if(client.status==='Activo'||client.status==='Perdido')return;const clientInteractions=interactions[client.id]||[];const hasRecentActivity=clientInteractions.some(i=>i.date>=cutoffDate);const hasNextAction=client.nextAction&&client.nextAction.date;if(!hasRecentActivity&&!hasNextAction){const daysSinceActivity=clientInteractions.length>0?Math.floor((new Date()-new Date(clientInteractions[clientInteractions.length-1].date))/86400000):9999;inactive.push({...client,daysSince:daysSinceActivity});}});inactive.sort((a,b)=>b.daysSince-a.daysSince);container.innerHTML=inactive.length===0?'<div style="text-align:center;color:var(--text-gray);padding:16px">Todos los clientes activos tienen seguimiento</div>':'';inactive.forEach(client=>{const el=document.createElement('div');el.style.cssText='padding:10px;background:#fff3e0;border-radius:6px;border-left:4px solid #fdab3d;cursor:pointer';el.innerHTML=`<div style="font-weight:600;font-size:12px">${client.name}</div><div style="font-size:11px;color:#b8860b;margin-top:4px">${ICO.pin} ${client.country} • ${client.status} <br>${ICO.warn} ${client.daysSince===9999?'Sin interacciones':client.daysSince+' días sin actividad'}</div>`;el.onclick=()=>openEditModal(client.id);container.appendChild(el);});};
+  </script>
+</body>
+</html>
